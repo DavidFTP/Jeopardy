@@ -94,6 +94,19 @@ export default function Play() {
     else if (currentTurnIndex >= players.length) setCurrentTurnIndex(players.length - 1);
   }, [players.length, currentTurnIndex]);
 
+  useEffect(() => {
+    if (!game) return;
+    if (players.length === 0) return;
+    persistSession(
+      players,
+      answeredIds,
+      currentBoard,
+      currentTurnIndex,
+      setupOpen ? "setup" : "playing"
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [game, players, answeredIds, currentBoard, currentTurnIndex, setupOpen]);
+
   const persistSession = (nextPlayers: Player[], nextAnswered: Set<string>, nextBoard: BoardId, turnIdx: number, phase: "setup" | "playing" | "finished") => {
     if (!game) return;
     saveSession({

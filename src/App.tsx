@@ -5,7 +5,7 @@ import Play from "./pages/Play";
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/Jeopardy">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/edit/:id" element={<Edit />} />
