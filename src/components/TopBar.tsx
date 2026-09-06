@@ -23,12 +23,14 @@ export function EditTopBar({
   onTitleChange,
   onBack,
   onPlay,
+  onPreview,
   placeholder,
 }: {
   title: string;
   onTitleChange: (v: string) => void;
   onBack: () => void;
   onPlay: () => void;
+  onPreview: () => void;
   placeholder: string;
 }) {
   return (
@@ -44,6 +46,7 @@ export function EditTopBar({
           </svg>
         </button>
         <input
+          dir="auto"
           value={title}
           onChange={(e) => onTitleChange(e.target.value)}
           placeholder={placeholder}
@@ -52,9 +55,8 @@ export function EditTopBar({
         <div className="flex-1" />
         <div className="flex items-center gap-4 shrink-0">
           <button
-            disabled
-            title="Coming soon"
-            className="hidden md:inline-flex text-slate-400 text-sm font-semibold cursor-not-allowed"
+            onClick={onPreview}
+            className="hidden md:inline-flex text-slate-500 hover:text-[#0f1d45] text-sm font-semibold transition"
           >
             Preview
           </button>

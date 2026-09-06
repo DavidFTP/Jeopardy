@@ -6,6 +6,9 @@ export type Media = {
   alt?: string;
 };
 
+// seconds; null = unlimited
+export type TimeLimit = 10 | 20 | 30 | 60 | 120 | 180 | null;
+
 export type Clue = {
   id: string;
   question: string;
@@ -13,6 +16,7 @@ export type Clue = {
   valueOverride?: number | null; // if null, derived from row + board
   media: Media[];
   isDailyDouble: boolean;
+  timeLimit?: TimeLimit; // seconds; null/undefined = unlimited
 };
 
 export type Category = {

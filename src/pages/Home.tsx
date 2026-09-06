@@ -74,7 +74,7 @@ export default function Home() {
             {games.map((g, i) => {
               void force;
               const playing = hasActiveSession(g.id);
-              getSession(g.id);
+              const isPodium = getSession(g.id)?.phase === "finished";
               const displayTitle = g.title.trim() || `Game ${i + 1}`;
               return (
                 <GameCard
@@ -82,6 +82,7 @@ export default function Home() {
                   game={g}
                   index={i}
                   isPlaying={playing}
+                  isPodium={isPodium}
                   onEdit={() => {
                     if (playing) {
                       setModal({ type: "edit-while-playing", id: g.id });

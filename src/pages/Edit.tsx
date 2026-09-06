@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { EditTopBar } from "../components/TopBar";
 import { BoardGridEditor } from "../components/BoardGridEditor";
 import { ClueEditorModal } from "../components/ClueEditorModal";
+import { PreviewOverlay } from "../components/PreviewOverlay";
 import { PlusIcon, XIcon } from "../components/icons";
 import type { BoardId, Clue, Game } from "../types/game";
 import { getClueValue } from "../types/game";
@@ -34,6 +35,7 @@ export default function Edit() {
     rowIdx: number;
     clue: Clue;
   } | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const bgInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -170,6 +172,7 @@ export default function Edit() {
         onTitleChange={(v) => setGame({ ...game, title: v })}
         onBack={handleBack}
         onPlay={handlePlay}
+        onPreview={() => setPreviewOpen(true)}
         placeholder={placeholder}
       />
 
@@ -430,6 +433,10 @@ export default function Edit() {
           onDelete={handleDeleteClue}
           onClose={() => setEditingClue(null)}
         />
+      )}
+
+      {previewOpen && (
+        <PreviewOverlay game={game} onClose={() => setPreviewOpen(false)} />
       )}
     </div>
   );

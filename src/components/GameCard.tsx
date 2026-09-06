@@ -4,6 +4,7 @@ export function GameCard({
   game,
   index,
   isPlaying,
+  isPodium,
   onEdit,
   onPlay,
   onDelete,
@@ -12,6 +13,7 @@ export function GameCard({
   game: Game;
   index: number;
   isPlaying: boolean;
+  isPodium: boolean;
   onEdit: () => void;
   onPlay: () => void;
   onDelete: () => void;
@@ -77,9 +79,9 @@ export function GameCard({
           onClick={onPlay}
           className="flex-1 bg-[#FFD700] hover:bg-[#ffdf33] text-[#0f1d45] font-black text-sm py-2 rounded-full shadow transition"
         >
-          Play
+          {isPodium ? "Podium" : "Play"}
         </button>
-        {isPlaying && (
+        {(isPlaying || isPodium) && (
           <button
             onClick={onRestart}
             className="px-4 bg-red-600 hover:bg-red-700 text-white font-bold text-sm py-2 rounded-full transition"

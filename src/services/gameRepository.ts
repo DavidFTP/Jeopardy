@@ -15,6 +15,7 @@ export function createEmptyClue(): Clue {
     valueOverride: null,
     media: [],
     isDailyDouble: false,
+    timeLimit: null,
   };
 }
 
@@ -156,6 +157,7 @@ function migrateGame(g: Game): Game {
         if (clue.media == null) (clue as unknown as Record<string, unknown>).media = [];
         if (clue.isDailyDouble == null) clue.isDailyDouble = false;
         if (clue.valueOverride === undefined) clue.valueOverride = null;
+        if (clue.timeLimit === undefined) clue.timeLimit = null;
       }
     }
   }

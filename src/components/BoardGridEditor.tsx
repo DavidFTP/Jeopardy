@@ -25,6 +25,7 @@ export function BoardGridEditor({
         {showCats && (
           <div className="shrink-0 bg-white rounded-xl border-2 border-[#FFD700] px-1.5 py-2 min-h-[44px] flex items-center">
             <input
+              dir="auto"
               value={cat.title}
               onChange={(e) => onCategoryTitleChange(0, e.target.value)}
               className="flex-1 min-w-0 bg-transparent text-slate-800 placeholder:text-slate-400 text-center font-black text-sm outline-none"
@@ -36,12 +37,12 @@ export function BoardGridEditor({
         {/* Clue box - matches normal grid empty clue cell */}
         <button
           onClick={() => onClueClick(0, 0, clue)}
-          className="mt-3 flex-1 min-h-0 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-3 text-center transition group overflow-hidden
+          className={`mt-3 flex-1 min-h-0 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-3 text-center transition group overflow-hidden
             ${hasContent
-              ? 'bg-white border-[#FFD700] hover:shadow-lg hover:shadow-[#FFD700]/20'
-              : 'bg-[#1e3a6e]/60 border-[#3b82f6]/40 hover:border-[#FFD700] hover:bg-[#1e3a6e]/80'
+              ? "bg-white border-[#FFD700] hover:shadow-lg hover:shadow-[#FFD700]/20"
+              : "bg-[#1e3a6e]/60 border-[#3b82f6]/40 hover:border-[#FFD700] hover:bg-[#1e3a6e]/80"
             }
-          "
+          `}
         >
           {!hasContent ? (
             <>
@@ -50,16 +51,16 @@ export function BoardGridEditor({
               </span>
             </>
           ) : (
-            <div className="w-full text-left p-4">
-              <div className="text-xs font-black tracking-widest text-slate-500 mb-2">
+            <div className="w-full text-center p-4">
+              <div className="text-xs font-black tracking-widest text-slate-700 mb-2">
                 {clue.isDailyDouble ? <span className="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full">DD</span> : "FINAL JEOPARDY CLUE"}
               </div>
               <div className="space-y-2">
-                <p className="text-slate-800 font-medium line-clamp-3">{clue.question || "Click to edit question..."}</p>
-                <div className="border-t border-dashed border-slate-300 my-2" />
-                <p className="text-slate-600 text-sm line-clamp-2">{clue.answer || "Click to edit answer..."}</p>
+                <p dir="auto" className="text-slate-900 font-bold line-clamp-3">{clue.question || "Click to edit question..."}</p>
+                <div className="border-t border-dashed border-slate-400 my-2" />
+                <p dir="auto" className="text-slate-700 text-sm line-clamp-2">{clue.answer || "Click to edit answer..."}</p>
               </div>
-              {clue.media.length > 0 && <p className="text-xs text-slate-500 mt-2">{clue.media.length} media attached</p>}
+              {clue.media.length > 0 && <p className="text-xs text-slate-600 mt-2">{clue.media.length} media attached</p>}
             </div>
           )}
         </button>
@@ -105,6 +106,7 @@ export function BoardGridEditor({
                   className="bg-white rounded-xl border-2 border-[#FFD700] px-1.5 py-2 min-h-[44px] min-w-0 flex items-center gap-1 overflow-hidden"
                 >
                   <input
+                    dir="auto"
                     value={cat.title}
                     onChange={(e) => onCategoryTitleChange(ci, e.target.value)}
                     className="flex-1 min-w-0 bg-transparent text-slate-800 placeholder:text-slate-400 text-center font-black text-sm outline-none"
@@ -138,6 +140,7 @@ export function BoardGridEditor({
                       <button
                         key={`${cat.id}-${rowIdx}`}
                         onClick={() => onClueClick(colIdx, rowIdx, clue)}
+                        style={{ containerType: "size" }}
                         className={`relative rounded-xl border-2 border-dashed min-h-0 min-w-0 flex flex-col items-center justify-center text-center transition group overflow-hidden
                           ${hasContent
                             ? "bg-white border-[#FFD700] hover:shadow-lg hover:shadow-[#FFD700]/20"
@@ -151,14 +154,14 @@ export function BoardGridEditor({
                               <PlusIcon size={plusSize} />
                             </span>
                             <span className={`font-black tracking-tight leading-none text-white/40 ${valueText}`}>
-                              ${value}
+                              {value}
                             </span>
                           </>
                         ) : (
-                          <div className="w-full text-left p-1.5 sm:p-2">
-                            <p className="text-slate-800 text-[10px] sm:text-xs font-medium leading-snug line-clamp-2">{clue.question}</p>
+                          <div className="w-full text-center p-1.5 sm:p-2">
+                            <p dir="auto" className="text-slate-800 font-medium leading-snug line-clamp-2" style={{ fontSize: "clamp(21px, min(13.5cqw, 18cqh), 66px)" }}>{clue.question}</p>
                             <div className="border-t border-dashed border-slate-300 my-1" />
-                            <p className="text-slate-500 text-[9px] sm:text-[11px] leading-snug line-clamp-2">{clue.answer}</p>
+                            <p dir="auto" className="text-slate-500 leading-snug line-clamp-2" style={{ fontSize: "clamp(18px, min(11.4cqw, 15cqh), 54px)" }}>{clue.answer}</p>
                           </div>
                         )}
                         {clue.isDailyDouble && (

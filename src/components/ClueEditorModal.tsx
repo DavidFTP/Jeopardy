@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
-import type { BoardId, Clue, MediaType } from "../types/game";
+import type { BoardId, Clue, MediaType, TimeLimit } from "../types/game";
 import { XIcon, TrashIcon, PlusIcon } from "./icons";
+
+const TIME_LIMIT_OPTIONS: { label: string; value: TimeLimit }[] = [
+  { label: "10s", value: 10 },
+  { label: "20s", value: 20 },
+  { label: "30s", value: 30 },
+  { label: "1 min", value: 60 },
+  { label: "2 min", value: 120 },
+  { label: "3 min", value: 180 },
+  { label: "Unlimited", value: null },
+];
 
 function newId() {
   return Math.random().toString(36).slice(2, 9);
@@ -99,6 +109,7 @@ export function ClueEditorModal({
           <div>
             <label className="block text-xs font-black tracking-widest text-slate-500 mb-1">QUESTION / CLUE</label>
             <textarea
+              dir="auto"
               value={draft.question}
               onChange={(e) => setDraft({ ...draft, question: e.target.value })}
               rows={3}
@@ -109,6 +120,7 @@ export function ClueEditorModal({
           <div>
             <label className="block text-xs font-black tracking-widest text-slate-500 mb-1">ANSWER</label>
             <textarea
+              dir="auto"
               value={draft.answer}
               onChange={(e) => setDraft({ ...draft, answer: e.target.value })}
               rows={2}
@@ -148,6 +160,30 @@ export function ClueEditorModal({
                 <span className="block text-xs text-slate-500">Hidden on the board until picked</span>
               </div>
             </label>
+          </div>
+
+          <div>
+            <label className="block text-xs font-black tracking-widest text-slate-500 mb-2">TIME LIMIT</label>
+            <div className="flex flex-wrap gap-2">
+              {TIME_LIMIT_OPTIONS.map((opt) => {
+                const active = (draft.timeLimit ?? null) === opt.value;
+                return (
+                  <button
+                    key={opt.label}
+                    type="button"
+                    onClick={() => setDraft({ ...draft, timeLimit: opt.value })}
+                    className={`px-3 py-1.5 rounded-full text-xs font-black border transition ${
+                      active
+                        ? "bg-[#FFD700] border-[#FFD700] text-[#0f1d45] shadow"
+                        : "bg-white border-slate-200 text-slate-600 hover:border-[#0f1d45] hover:text-[#0f1d45]"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-[11px] text-slate-500 mt-1">Time the player has to answer. {draft.timeLimit == null ? "Unlimited is selected." : `Selected: ${draft.timeLimit >= 60 ? `${draft.timeLimit / 60} min` : `${draft.timeLimit} sec`}.`}</p>
           </div>
 
           <div>
