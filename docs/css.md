@@ -121,7 +121,8 @@ Edit-page board grid — prefix **`.bge-`**:
 - Cells: `.bge-cell` (+`--has`/`--empty`), `__plus`, `__value`,
   **cell preview text** `.bge-cell-q` / `.bge-cell-a` (scale to the cell with
   container queries — see [Scaling text to a cell](#scaling-text-to-a-cell)),
-  `.bge-cell-divider`, `.bge-dd-marker`.
+  `.bge-cell-divider`, `.bge-dd-marker` (Daily Double, top-right),
+  `.bge-time-marker` (time limit pill, bottom-left; hidden when unlimited).
 
 ### `src/components/PreviewOverlay.css`
 Preview mode — three prefixes:

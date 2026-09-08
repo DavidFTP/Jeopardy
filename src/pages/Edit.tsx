@@ -339,9 +339,25 @@ export default function Edit() {
                   if (!file) return;
                   const reader = new FileReader();
                   reader.onload = (ev) => {
-                    setGame({ ...game, coverImageUrl: ev.target?.result as string });
+                    const src = ev.target?.result as string;
+                    const img = new Image();
+                    img.onload = () => {
+                      const MAX = 1600;
+                      const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+                      const w = Math.max(1, Math.round(img.width * scale));
+                      const h = Math.max(1, Math.round(img.height * scale));
+                      const canvas = document.createElement("canvas");
+                      canvas.width = w;
+                      canvas.height = h;
+                      const ctx = canvas.getContext("2d");
+                      if (!ctx) return;
+                      ctx.drawImage(img, 0, 0, w, h);
+                      setGame({ ...game, coverImageUrl: canvas.toDataURL("image/jpeg", 0.82) });
+                    };
+                    img.src = src;
                   };
                   reader.readAsDataURL(file);
+                  e.target.value = "";
                 }}
               />
               <button

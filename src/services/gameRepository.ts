@@ -118,12 +118,16 @@ export const localGameRepository: GameRepository = {
     return this.list().find((g) => g.id === id);
   },
   save(game: Game) {
-    const all = this.list();
-    const idx = all.findIndex((g) => g.id === game.id);
-    const toSave = { ...game, updatedAt: Date.now() };
-    if (idx >= 0) all[idx] = toSave;
-    else all.unshift(toSave);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+    try {
+      const all = this.list();
+      const idx = all.findIndex((g) => g.id === game.id);
+      const toSave = { ...game, updatedAt: Date.now() };
+      if (idx >= 0) all[idx] = toSave;
+      else all.unshift(toSave);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+    } catch (err) {
+      console.error("Failed to save game to localStorage:", err);
+    }
   },
   delete(id: string) {
     const all = this.list().filter((g) => g.id !== id);
@@ -185,12 +189,16 @@ export function getSession(gameId: string): GameSession | undefined {
 }
 
 export function saveSession(sess: GameSession) {
-  const all = listSessions();
-  const idx = all.findIndex((s) => s.gameId === sess.gameId);
-  const toSave = { ...sess, updatedAt: Date.now() };
-  if (idx >= 0) all[idx] = toSave;
-  else all.push(toSave);
-  localStorage.setItem(SESSION_KEY, JSON.stringify(all));
+  try {
+    const all = listSessions();
+    const idx = all.findIndex((s) => s.gameId === sess.gameId);
+    const toSave = { ...sess, updatedAt: Date.now() };
+    if (idx >= 0) all[idx] = toSave;
+    else all.push(toSave);
+    localStorage.setItem(SESSION_KEY, JSON.stringify(all));
+  } catch (err) {
+    console.error("Failed to save session to localStorage:", err);
+  }
 }
 
 export function deleteSession(gameId: string) {

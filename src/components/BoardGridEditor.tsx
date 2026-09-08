@@ -3,6 +3,21 @@ import type { CSSProperties } from "react";
 import type { Board, Category, Clue } from "../types/game";
 import { PlusIcon } from "./icons";
 
+function formatTimeLabel(t: number): string {
+  return t >= 60 ? `${t / 60} min` : `${t}s`;
+}
+
+function TimeLimitMarker({ timeLimit }: { timeLimit: number }) {
+  return (
+    <span
+      className="bge-time-marker"
+      title={`Time limit: ${formatTimeLabel(timeLimit)}`}
+    >
+      {formatTimeLabel(timeLimit)}
+    </span>
+  );
+}
+
 export function BoardGridEditor({
   board,
   onCategoryTitleChange,
@@ -59,6 +74,9 @@ export function BoardGridEditor({
                 <p className="bge-final-meta">{clue.media.length} media attached</p>
               )}
             </div>
+          )}
+          {hasContent && clue.timeLimit != null && (
+            <TimeLimitMarker timeLimit={clue.timeLimit} />
           )}
         </button>
       </div>
@@ -139,6 +157,9 @@ export function BoardGridEditor({
                           <span className="bge-dd-marker" title="Daily Double">
                             D
                           </span>
+                        )}
+                        {hasContent && clue.timeLimit != null && (
+                          <TimeLimitMarker timeLimit={clue.timeLimit} />
                         )}
                       </button>
                     );

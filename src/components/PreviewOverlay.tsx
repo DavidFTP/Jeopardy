@@ -57,19 +57,7 @@ export function PreviewOverlay({
   }, [timeLeft]);
 
   return (
-    <div
-      className="prev-root"
-      style={
-        game.coverImageUrl?.trim()
-          ? {
-              backgroundImage: `linear-gradient(rgba(6,12,233,0.88), rgba(3,17,75,0.92)), url(${game.coverImageUrl})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundAttachment: "fixed",
-            }
-          : { background: "#0f1d45" }
-      }
-    >
+    <div className="prev-root" style={{ background: "#0f1d45" }}>
       <div className="prev-top-left">
         <button onClick={onClose} className="btn-glass">
           ← Back to Edit

@@ -503,19 +503,8 @@ export default function Play() {
 
   if (gameOver) {
     return (
-      <div
-        className="podium-screen"
-        style={
-          game.coverImageUrl?.trim()
-            ? {
-                backgroundImage: `linear-gradient(rgba(6,12,233,0.88), rgba(3,17,75,0.92)), url(${game.coverImageUrl})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundAttachment: "fixed",
-              }
-            : { background: "#0f1d45" }
-        }
-      >
+      <div className="podium-screen" style={{ background: "#0f1d45" }}>
+        <Confetti />
         <div className="play-top-left">
           <Link to="/" className="btn-glass btn-xs">
             ← Home
@@ -640,19 +629,7 @@ export default function Play() {
   }
 
   return (
-    <div
-      className="play-shell"
-      style={
-        game.coverImageUrl?.trim()
-          ? {
-              backgroundImage: `linear-gradient(rgba(6,12,233,0.88), rgba(3,17,75,0.92)), url(${game.coverImageUrl})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundAttachment: "fixed",
-            }
-          : { background: "#0f1d45" }
-      }
-    >
+    <div className="play-shell" style={{ background: "#0f1d45" }}>
       <div className="play-top-left">
         <Link to="/" className="btn-glass btn-xs">
           ← Home
@@ -1115,7 +1092,7 @@ export default function Play() {
                   <div className="cluecard__top">
                     <div className="cluecard__label">
                       {activeClue.boardId === "final"
-                        ? "FINAL JEOPARDY · WAGER"
+                        ? "FINAL JEOPARDY"
                         : activeClue.boardId === "double"
                           ? "DOUBLE JEOPARDY"
                           : "JEOPARDY"}{" "}
@@ -1207,7 +1184,7 @@ export default function Play() {
                           onClick={finishFinalClue}
                           className="play-clue__final-btn"
                         >
-                          Close & Score Final →
+                          Final Scores →
                         </button>
                       )}
                   </div>
@@ -1366,6 +1343,53 @@ function BoardPlayGrid({
           ),
         )}
       </div>
+    </div>
+  );
+}
+
+const CONFETTI_COLORS = [
+  "#ffd700",
+  "#ff5a5f",
+  "#4ecdc4",
+  "#5b8cff",
+  "#a78bfa",
+  "#f97316",
+  "#f43f5e",
+  "#34d399",
+];
+
+const CONFETTI_PIECES = Array.from({ length: 42 }, () => ({
+  left: Math.random() * 100,
+  delay: -Math.random() * 14,
+  dur: 3.5 + Math.random() * 4.5,
+  drift: (Math.random() - 0.5) * 160,
+  rot: (Math.random() - 0.5) * 540,
+  w: 6 + Math.random() * 6,
+  h: 8 + Math.random() * 9,
+  color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+}));
+
+function Confetti() {
+  return (
+    <div className="confetti" aria-hidden="true">
+      {CONFETTI_PIECES.map((p, i) => (
+        <span
+          key={i}
+          className="confetti-piece"
+          style={
+            {
+              left: `${p.left}%`,
+              width: p.w,
+              height: p.h,
+              background: p.color,
+              animationDelay: `${p.delay}s`,
+              animationDuration: `${p.dur}s`,
+              "--drift": `${p.drift}px`,
+              "--rot": `${p.rot}deg`,
+            } as CSSProperties
+          }
+        />
+      ))}
     </div>
   );
 }

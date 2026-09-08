@@ -96,6 +96,40 @@
   align-items: center;
   overflow: hidden;
 }
+
+/* confetti rain */
+.confetti {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 5;
+}
+.confetti-piece {
+  position: absolute;
+  top: -4vh;
+  border-radius: 2px;
+  opacity: 0;
+  animation: confetti-fall var(--dur, 5s) cubic-bezier(0.3, 0.5, 0.4, 1)
+    var(--delay, 0s) infinite;
+}
+@keyframes confetti-fall {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -4vh, 0) rotate(0deg);
+  }
+  8% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift, 0px), 106vh, 0)
+      rotate(var(--rot, 360deg));
+  }
+}
 .podium-scroll {
   flex: 1;
   width: 100%;
@@ -257,44 +291,68 @@
 }
 .podium-col {
   flex: 1;
-  max-width: 240px;
   border: 1px solid rgb(255 255 255 / 0.15);
   border-radius: 16px 16px 0 0;
   padding: 20px 12px 12px;
   text-align: center;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
 }
 .podium-col--1 {
-  max-width: 280px;
   background: var(--gold);
   border-color: rgb(255 215 0 / 0.8);
   border-radius: 24px 24px 0 0;
   padding: 32px 12px 16px;
   box-shadow: var(--shadow-xl);
+  min-height: 300px;
 }
 .podium-col--2 {
   background: rgb(148 163 184 / 0.2);
+  min-height: 280px;
 }
 .podium-col--3 {
   background: rgb(217 119 6 / 0.25);
+  min-height: 250px;
+}
+@media (min-width: 768px) {
+  .podium-col {
+    min-height: 250px;
+  }
+  .podium-col--1 {
+    min-height: 350px;
+  }
+  .podium-col--2 {
+    min-height: 320px;
+  }
+  .podium-col--3 {
+    min-height: 280px;
+  }
 }
 .podium-col__rank1 {
   color: var(--navy-900);
-  font-size: 36px;
+  font-size: 30px;
+  letter-spacing: 0.3em;
   font-weight: 900;
 }
 .podium-col__rank {
   color: var(--silver-text);
   font-size: 24px;
+  letter-spacing: 0.3em;
   font-weight: 900;
 }
 .podium-col__rank3 {
   color: var(--bronze-text);
   font-size: 24px;
+  letter-spacing: 0.3em;
   font-weight: 900;
 }
 .podium-col__name1 {
   color: var(--navy-900);
-  font-size: 20px;
+  font-size: 55px;
   font-weight: 900;
   margin-top: 12px;
   white-space: nowrap;
@@ -303,7 +361,7 @@
 }
 .podium-col__name {
   color: var(--white);
-  font-size: 18px;
+  font-size: 30px;
   font-weight: 900;
   margin-top: 8px;
   white-space: nowrap;
@@ -312,19 +370,19 @@
 }
 .podium-col__score1 {
   color: var(--navy-900);
-  font-size: 18px;
+  font-size: 25px;
   font-weight: 900;
   margin-top: 4px;
 }
 .podium-col__score {
   color: var(--silver-text);
-  font-size: 14px;
+  font-size: 20px;
   font-weight: 900;
   margin-top: 4px;
 }
 .podium-col__score3 {
   color: var(--bronze-text);
-  font-size: 14px;
+  font-size: 20px;
   font-weight: 900;
   margin-top: 4px;
 }
@@ -682,13 +740,15 @@ p {
 
 /* ---------- Score edit modal ---------- */
 .score-modal__body {
-  padding: 24px;
+  padding: 14xp;
   text-align: center;
 }
 .score-modal__name {
   font-weight: 900;
-  font-size: 20px;
+  font-size: 30px;
   color: var(--slate-900);
+  margin: 0;
+  padding: 7px;
 }
 .score-modal__row {
   margin-top: 20px;
@@ -698,7 +758,7 @@ p {
   gap: 12px;
 }
 .score-modal__label {
-  font-size: 14px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--slate-600);
 }
@@ -708,6 +768,7 @@ p {
   border-radius: var(--r-md);
   padding: 10px 16px;
   font-size: 18px;
+  color: var(--navy-900);
   font-weight: 900;
   text-align: center;
 }
@@ -717,7 +778,7 @@ p {
   box-shadow: 0 0 0 2px var(--navy-900);
 }
 .score-modal__turn {
-  margin-top: 16px;
+  margin: 10px 0;
   font-size: 12px;
   color: var(--slate-400);
 }
@@ -755,15 +816,14 @@ p {
 }
 .wager-card__title {
   font-weight: 900;
-  font-size: 24px;
+  font-size: 30px;
   text-align: center;
   color: var(--navy-900);
 }
 .wager-card__sub {
   text-align: center;
   color: var(--slate-600);
-  font-size: 14px;
-  margin-top: 4px;
+  font-size: 20px;
 }
 .wager-list {
   margin-top: 20px;
@@ -784,7 +844,7 @@ p {
 .wager-row__name {
   flex: 1;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 24px;
   color: var(--slate-800);
   white-space: nowrap;
   overflow: hidden;
@@ -792,18 +852,19 @@ p {
 }
 .wager-row__score {
   font-weight: 400;
-  color: var(--slate-400);
-  font-size: 12px;
+  color: var(--slate-500);
+  font-size: 20px;
 }
 .wager-row__input {
   width: 96px;
   border: 1px solid var(--slate-300);
   border-radius: var(--r-md);
   padding: 6px 8px;
-  font-size: 14px;
+  font-size: 20px;
   font-weight: 900;
   text-align: right;
   flex-shrink: 0;
+  color: var(--board-dark);
 }
 .wager-row__input:focus {
   outline: none;
@@ -829,6 +890,7 @@ p {
   border-radius: var(--r-pill);
   padding: 12px;
   font-size: 14px;
+  color: var(--board-dark);
 }
 .wager-btn--ghost {
   border: 1px solid var(--slate-300);
@@ -875,13 +937,12 @@ p {
   font-size: 24px;
 }
 .play-clue__final-btn {
-  background: var(--navy-900);
+  background: var(--navy-700);
   color: var(--white);
   padding: 20px 48px;
   border-radius: var(--r-pill);
   font-weight: 900;
-  font-size: 30px;
-  margin-top: 8px;
+  font-size: 27px;
   cursor: pointer;
 }
 .play-clue__void {
