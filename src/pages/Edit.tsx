@@ -1,3 +1,4 @@
+import "./Edit.css";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { EditTopBar } from "../components/TopBar";
@@ -16,7 +17,7 @@ import { useGameStore } from "../stores/gameStore";
 
 function ImageIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/40">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
       <circle cx="8.5" cy="8.5" r="1.5" />
       <polyline points="21 15 16 10 5 21" />
@@ -49,7 +50,6 @@ export default function Edit() {
     else if (games.length > 0) nav("/", { replace: true });
   }, [id, games, nav]);
 
-  // Auto-save debounce
   useEffect(() => {
     if (!game) return;
     const t = setTimeout(() => {
@@ -69,9 +69,7 @@ export default function Edit() {
 
   if (!game) {
     return (
-      <div className="min-h-screen bg-[#0f1d45] flex items-center justify-center text-white">
-        Loading...
-      </div>
+      <div className="edit-loading">Loading...</div>
     );
   }
 
@@ -166,7 +164,7 @@ export default function Edit() {
   };
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-[#0f1d45]">
+    <div className="edit-page">
       <EditTopBar
         title={game.title}
         onTitleChange={(v) => setGame({ ...game, title: v })}
@@ -176,32 +174,23 @@ export default function Edit() {
         placeholder={placeholder}
       />
 
-      <div className="flex-1 flex min-h-0">
-        {/* Main content */}
-        <div className="flex-1 min-h-0 flex flex-col overflow-hidden px-6 pt-9 pb-4">
-            {/* Board pills - floating, no panel */}
-            <div className="flex items-center justify-center gap-3 mb-5 shrink-0">
-              {/* Jeopardy - always enabled */}
+      <div className="edit-main">
+        <div className="edit-content">
+            <div className="edit-pills">
               <button
                 onClick={() => setActiveBoard("jeopardy")}
-                className={`px-6 py-2.5 rounded-full font-bold text-sm border-2 transition
-                  ${activeBoard === "jeopardy"
-                    ? "bg-white border-[#FFD700] text-[#0f1d45]"
-                    : "bg-transparent border-white/30 text-white/70 hover:border-white/50 hover:text-white"
-                  }
-                `}
+                className={`edit-tab ${activeBoard === "jeopardy" ? "edit-tab--active" : "edit-tab--idle"}`}
               >
                 Jeopardy
               </button>
 
-              {/* Double Jeopardy */}
-              <div className="relative">
+              <div className="edit-chip-wrap">
                 {!game.boards.double.enabled ? (
                   <button
                     onClick={() => toggleBoardEnabled("double")}
                     title="Add Double Jeopardy"
                     aria-label="Add Double Jeopardy"
-                    className="px-4 py-2.5 rounded-full bg-transparent border-2 border-white/30 text-white/70 hover:border-white/60 hover:text-white font-bold text-sm flex items-center gap-1.5 transition"
+                    className="edit-tab-add"
                   >
                     <PlusIcon size={18} />
                     Add Double Jeopardy
@@ -209,12 +198,7 @@ export default function Edit() {
                 ) : (
                 <button
                   onClick={() => setActiveBoard("double")}
-                  className={`px-6 py-2.5 rounded-full font-bold text-sm border-2 transition
-                    ${activeBoard === "double"
-                      ? "bg-white border-[#FFD700] text-[#0f1d45]"
-                      : "bg-transparent border-white/30 text-white/70 hover:border-white/50 hover:text-white"
-                    }
-                  `}
+                  className={`edit-tab ${activeBoard === "double" ? "edit-tab--active" : "edit-tab--idle"}`}
                 >
                   Double Jeopardy
                 </button>
@@ -222,7 +206,7 @@ export default function Edit() {
                 {game.boards.double.enabled && (
                   <button
                     onClick={() => toggleBoardEnabled("double")}
-                    className="absolute -top-2 -right-2.5 w-6 h-6 rounded-full bg-[#1e3a6e] hover:bg-red-500 text-white flex items-center justify-center border-2 border-[#0f1d45] transition"
+                    className="edit-remove-chip"
                     title="Remove Double Jeopardy"
                     aria-label="Remove Double Jeopardy"
                   >
@@ -231,14 +215,13 @@ export default function Edit() {
                 )}
               </div>
 
-              {/* Final Jeopardy */}
-              <div className="relative">
+              <div className="edit-chip-wrap">
                 {!game.boards.final.enabled ? (
                   <button
                     onClick={() => toggleBoardEnabled("final")}
                     title="Add Final Jeopardy"
                     aria-label="Add Final Jeopardy"
-                    className="px-4 py-2.5 rounded-full bg-transparent border-2 border-white/30 text-white/70 hover:border-white/60 hover:text-white font-bold text-sm flex items-center gap-1.5 transition"
+                    className="edit-tab-add"
                   >
                     <PlusIcon size={18} />
                     Add Final Jeopardy
@@ -246,12 +229,7 @@ export default function Edit() {
                 ) : (
                 <button
                   onClick={() => setActiveBoard("final")}
-                  className={`px-6 py-2.5 rounded-full font-bold text-sm border-2 transition
-                    ${activeBoard === "final"
-                      ? "bg-white border-[#FFD700] text-[#0f1d45]"
-                      : "bg-transparent border-white/30 text-white/70 hover:border-white/50 hover:text-white"
-                    }
-                  `}
+                  className={`edit-tab ${activeBoard === "final" ? "edit-tab--active" : "edit-tab--idle"}`}
                 >
                   Final Jeopardy
                 </button>
@@ -259,7 +237,7 @@ export default function Edit() {
                 {game.boards.final.enabled && (
                   <button
                     onClick={() => toggleBoardEnabled("final")}
-                    className="absolute -top-2 -right-2.5 w-6 h-6 rounded-full bg-[#1e3a6e] hover:bg-red-500 text-white flex items-center justify-center border-2 border-[#0f1d45] transition"
+                    className="edit-remove-chip"
                     title="Remove Final Jeopardy"
                     aria-label="Remove Final Jeopardy"
                   >
@@ -269,14 +247,19 @@ export default function Edit() {
               </div>
             </div>
 
-          {/* Grid - takes remaining space, no scroll */}
-          <div className="flex-1 min-h-0">
+          <div className="edit-grid-wrap">
             {!board.enabled ? (
-              <div className="h-full flex items-center justify-center">
-                <div className="bg-white/5 border border-dashed border-white/20 rounded-2xl p-10 text-center">
-                  <p className="text-white font-bold">{board.id === "double" ? "Double Jeopardy is off" : "Final Jeopardy is off"}</p>
-                  <p className="text-white/60 text-sm mt-1">Click the pill above to re-enable. Previous edits are kept.</p>
-                  <button onClick={() => toggleBoardEnabled(board.id)} className="mt-4 px-6 py-2 rounded-full bg-[#FFD700] text-[#0f1d45] font-black text-sm">Enable</button>
+              <div className="edit-disabled">
+                <div className="edit-disabled-card">
+                  <p className="edit-disabled-title">
+                    {board.id === "double" ? "Double Jeopardy is off" : "Final Jeopardy is off"}
+                  </p>
+                  <p className="edit-disabled-sub">
+                    Click the pill above to re-enable. Previous edits are kept.
+                  </p>
+                  <button onClick={() => toggleBoardEnabled(board.id)} className="btn btn-gold edit-disabled-btn">
+                    Enable
+                  </button>
                 </div>
               </div>
             ) : (
@@ -289,86 +272,68 @@ export default function Edit() {
           </div>
         </div>
 
-        {/* Right side panel - hovering card from edge */}
-        <aside className="hidden lg:flex shrink-0 w-[180px] pr-0 items-center">
-          <div className="w-full bg-[#1a2d5c] rounded-l-2xl border border-white/10 border-r-0 p-4 space-y-4 shadow-2xl">
-            {/* Columns */}
+        <aside className="edit-side">
+          <div className="edit-side-card">
             {activeBoard !== "final" && (
             <div>
-              <div className="flex items-center gap-2 mb-3">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white/60">
+              <div className="edit-side-head">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="3" y="3" width="7" height="18" rx="1" />
                   <rect x="14" y="3" width="7" height="18" rx="1" />
                 </svg>
-                <span className="text-white text-sm font-bold">Columns</span>
+                <span>Columns</span>
               </div>
-              <div className="flex items-center justify-between">
-                <button
-                  onClick={() => resizeBoard(currentCols - 1, currentRows)}
-                  className="w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white font-bold text-lg flex items-center justify-center transition"
-                >
+              <div className="edit-stepper-row">
+                <button onClick={() => resizeBoard(currentCols - 1, currentRows)} className="edit-stepper">
                   −
                 </button>
-                <span className="text-white font-black text-xl w-10 text-center">{currentCols}</span>
-                <button
-                  onClick={() => resizeBoard(currentCols + 1, currentRows)}
-                  disabled={currentCols >= 10}
-                  className="w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white font-bold text-lg flex items-center justify-center transition disabled:opacity-30"
-                >
+                <span className="edit-stepper-val">{currentCols}</span>
+                <button onClick={() => resizeBoard(currentCols + 1, currentRows)} disabled={currentCols >= 10} className="edit-stepper">
                   +
                 </button>
               </div>
             </div>
             )}
 
-            {activeBoard !== "final" && <div className="border-t border-white/10" />}
+            {activeBoard !== "final" && <div className="edit-divider" />}
 
-            {/* Rows */}
             {activeBoard !== "final" && (
             <div>
-              <div className="flex items-center gap-2 mb-3">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white/60">
+              <div className="edit-side-head">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="3" y="3" width="18" height="7" rx="1" />
                   <rect x="3" y="14" width="18" height="7" rx="1" />
                 </svg>
-                <span className="text-white text-sm font-bold">Rows</span>
+                <span>Rows</span>
               </div>
-              <div className="flex items-center justify-between">
-                <button
-                  onClick={() => resizeBoard(currentCols, currentRows - 1)}
-                  className="w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white font-bold text-lg flex items-center justify-center transition"
-                >
+              <div className="edit-stepper-row">
+                <button onClick={() => resizeBoard(currentCols, currentRows - 1)} className="edit-stepper">
                   −
                 </button>
-                <span className="text-white font-black text-xl w-10 text-center">{currentRows}</span>
-                <button
-                  onClick={() => resizeBoard(currentCols, currentRows + 1)}
-                  disabled={currentRows >= 10}
-                  className="w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white font-bold text-lg flex items-center justify-center transition disabled:opacity-30"
-                >
+                <span className="edit-stepper-val">{currentRows}</span>
+                <button onClick={() => resizeBoard(currentCols, currentRows + 1)} disabled={currentRows >= 10} className="edit-stepper">
                   +
                 </button>
               </div>
             </div>
             )}
 
-            <div className="border-t border-white/10" />
+            <div className="edit-divider" />
 
-            {/* Background */}
             <div>
-              <div className="flex items-center gap-2 mb-3">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white/60">
+              <div className="edit-side-head">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                   <circle cx="8.5" cy="8.5" r="1.5" />
                   <polyline points="21 15 16 10 5 21" />
                 </svg>
-                <span className="text-white text-sm font-bold">Background</span>
+                <span>Background</span>
               </div>
               <input
                 ref={bgInputRef}
                 type="file"
                 accept="image/*"
-                className="hidden"
+                hidden
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (!file) return;
@@ -381,43 +346,43 @@ export default function Edit() {
               />
               <button
                 onClick={() => bgInputRef.current?.click()}
-                className="w-full border-2 border-dashed border-white/20 rounded-xl p-5 flex flex-col items-center justify-center gap-2 hover:border-white/40 hover:bg-white/5 transition cursor-pointer"
+                className="edit-upload"
               >
                 {game.coverImageUrl?.trim() ? (
                   <>
-                    <img src={game.coverImageUrl} alt="Background" className="w-full h-20 object-cover rounded-lg" />
-                    <span className="text-white/50 text-xs mt-1">Click to change</span>
+                    <img src={game.coverImageUrl} alt="Background" className="edit-upload-img" />
+                    <span className="edit-upload-txt edit-upload-txt--sub">Click to change</span>
                   </>
                 ) : (
                   <>
                     <ImageIcon />
-                    <span className="text-white/50 text-xs text-center leading-tight">Drag an image here,<br />or click to pick one</span>
+                    <span className="edit-upload-txt">
+                      Drag an image here,<br />or click to pick one
+                    </span>
                   </>
                 )}
               </button>
               {game.coverImageUrl?.trim() && (
                 <button
                   onClick={() => setGame({ ...game, coverImageUrl: "" })}
-                  className="mt-2 w-full text-red-400/70 hover:text-red-400 text-xs text-center"
+                  className="edit-remove-bg"
                 >
                   Remove background
                 </button>
               )}
             </div>
 
-            {/* Show categories */}
-            <div className="border-t border-white/10" />
-            <label className="flex items-center justify-between cursor-pointer">
-              <span className="text-white text-sm font-bold">Show categories</span>
-                  <div className="relative">
-                    <input
-                      type="checkbox"
-                      checked={board.showCategories}
-                      onChange={(e) => setGame({ ...game, boards: { ...game.boards, [activeBoard]: { ...board, showCategories: e.target.checked } } })}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FFD700]"></div>
-                  </div>
+            <div className="edit-divider" />
+            <label className="edit-showcats">
+              <span>Show categories</span>
+              <span className="toggle">
+                <input
+                  type="checkbox"
+                  checked={board.showCategories}
+                  onChange={(e) => setGame({ ...game, boards: { ...game.boards, [activeBoard]: { ...board, showCategories: e.target.checked } } })}
+                />
+                <span className="toggle-track" />
+              </span>
             </label>
           </div>
         </aside>

@@ -1,3 +1,5 @@
+import "./Play.css";
+import type { CSSProperties } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { EVENT_NAME } from "../config/event";
@@ -36,7 +38,6 @@ export default function Play() {
     new Set(),
   );
   const [gameOver, setGameOver] = useState(false);
-  // clue modal state
   const [activeClue, setActiveClue] = useState<{
     clue: Clue;
     catIdx: number;
@@ -52,7 +53,6 @@ export default function Play() {
     amount: string;
     step: "pick" | "reveal";
   } | null>(null);
-  // final wager state
   const [finalWagers, setFinalWagers] = useState<Record<string, string>>({});
   const [finalPhase, setFinalPhase] = useState<"clue" | "scoring" | null>(null);
   const [confirmModal, setConfirmModal] = useState<{
@@ -74,7 +74,6 @@ export default function Play() {
       setGame(structuredClone(g) as Game);
       const sess = getSession(g.id);
       if (sess) {
-        // restore any session (including finished) so the podium persists
         setPlayers(sess.players);
         setAnsweredIds(new Set(sess.answeredClueIds));
         setCurrentBoard(sess.currentBoard);
@@ -82,7 +81,6 @@ export default function Play() {
         setGameOver(sess.phase === "finished");
         setSetupOpen(sess.phase === "setup");
       } else {
-        // no active session -> start a fresh game
         setPlayers([]);
         setAnsweredIds(new Set());
         setCurrentBoard("jeopardy");
@@ -115,7 +113,6 @@ export default function Play() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [game, players, answeredIds, currentBoard, currentTurnIndex, setupOpen]);
 
-  // Reset countdown when a clue is revealed (skip during wager pick step)
   useEffect(() => {
     setFlashRed(false);
     if (
@@ -129,7 +126,6 @@ export default function Play() {
     setTimeLeft(activeClue.clue.timeLimit);
   }, [activeClue, wagerState?.step]);
 
-  // countdown tick
   useEffect(() => {
     if (timeLeft == null || timeLeft <= 0) return;
     const t = setTimeout(
@@ -139,7 +135,6 @@ export default function Play() {
     return () => clearTimeout(t);
   }, [timeLeft]);
 
-  // flash red when time hits zero, then return to original colour
   useEffect(() => {
     if (timeLeft !== 0) return;
     setFlashRed(true);
@@ -494,11 +489,7 @@ export default function Play() {
   };
 
   if (!game || !board) {
-    return (
-      <div className="min-h-screen bg-[#0f1d45] flex items-center justify-center text-white">
-        Loading...
-      </div>
-    );
+    return <div className="play-shell play-shell--loading">Loading...</div>;
   }
 
   const displayTitle =
@@ -513,7 +504,7 @@ export default function Play() {
   if (gameOver) {
     return (
       <div
-        className="h-screen relative flex flex-col items-center overflow-hidden"
+        className="podium-screen"
         style={
           game.coverImageUrl?.trim()
             ? {
@@ -525,63 +516,46 @@ export default function Play() {
             : { background: "#0f1d45" }
         }
       >
-        <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
-          <Link
-            to="/"
-            className="px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white font-bold text-sm transition"
-          >
+        <div className="play-top-left">
+          <Link to="/" className="btn-glass btn-xs">
             ← Home
           </Link>
-          <button
-            onClick={requestRestart}
-            className="px-4 py-2 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold text-sm transition"
-          >
+          <button onClick={requestRestart} className="btn-danger btn-xs">
             Restart
           </button>
         </div>
-        <div className="flex-1 w-full max-w-[1100px] px-6 py-10 flex flex-col items-center overflow-y-auto">
-          <div className="text-center">
-            <div className="text-white font-black tracking-tight text-4xl md:text-6xl">
-              {EVENT_NAME}
-            </div>
-            <div className="text-[#FFD700] font-bold text-3xl md:text-5xl mt-3">
-              {displayTitle}
-            </div>
-            <div className="mt-4 text-sm font-black tracking-[0.3em] text-white/60">
-              GAME COMPLETE
-            </div>
+        <div className="podium-scroll">
+          <div className="podium-head">
+            <div className="podium-event">{EVENT_NAME}</div>
+            <div className="podium-title">{displayTitle}</div>
+            <div className="podium-complete">MATCH COMPLETE</div>
           </div>
 
           {players.length > 0 ? (
             <>
               {players.length === 2 ? (
-                /* two-player podium: winner glorified, vertical stack */
-                <div className="mt-10 w-full max-w-lg flex flex-col gap-10">
+                <div className="podium-duo">
                   {podium[0] && (
-                    <div className="bg-[#FFD700] text-[#0f1d45] rounded-2xl px-6 py-10 md:py-12 text-center shadow-xl">
-                      <div className="flex flex-col items-center gap-3">
-                        <span className="text-sm md:text-base font-black tracking-[0.3em]">
-                          1st
-                        </span>
-                        <span dir="auto" className="text-3xl md:text-5xl font-black truncate">
+                    <div className="podium-duo__1">
+                      <div className="podium-duo__1-inner">
+                        <span className="podium-duo__rank">1st</span>
+                        <span className="podium-duo__name">
                           {podium[0].name}
                         </span>
-                        <span className="text-3xl md:text-5xl font-black">
+                        <span className="podium-duo__score">
                           {podium[0].score}
                         </span>
                       </div>
                     </div>
                   )}
                   {podium[1] && (
-                    <div className="bg-white/10 border border-white/15 rounded-xl px-6 py-4 text-center">
-                      <div className="flex flex-col items-center gap-1">
-                        <span className="text-sm font-black tracking-widest text-[#cbd5e1]">
-                          2nd
-                        </span>
-                        <span dir="auto" className="text-lg md:text-xl font-black text-white truncate">
+                    <div className="podium-duo__2">
+                      <div className="podium-duo__2-inner">
+                        <span className="podium-duo__2rank">2nd</span>
+                        <span className="podium-duo__2name">
                           {podium[1].name}
                         </span>
-                        <span className="text-lg font-black text-[#cbd5e1]">
+                        <span className="podium-duo__2score">
                           {podium[1].score}
                         </span>
                       </div>
@@ -589,55 +563,37 @@ export default function Play() {
                   )}
                 </div>
               ) : (
-                /* podium top 3 */
-                <div className="mt-10 w-full flex items-end justify-center gap-3 md:gap-6">
-                  {/* 2nd */}
+                <div className="podium-top3">
                   {podium[1] && (
                     <div
                       key={podium[1].id}
-                      className="flex-1 max-w-[240px] bg-[#94a3b8]/20 border border-white/15 rounded-t-2xl px-3 pt-5 pb-3 text-center"
+                      className="podium-col podium-col--2"
                     >
-                      <div className="text-2xl font-black text-[#cbd5e1]">
-                        2nd
-                      </div>
-                      <div className="mt-2 text-white font-black text-lg truncate">
-                        {podium[1].name}
-                      </div>
-                      <div className="text-[#cbd5e1] font-black text-sm">
-                        {podium[1].score}
-                      </div>
+                      <div className="podium-col__rank">2nd</div>
+                      <div className="podium-col__name">{podium[1].name}</div>
+                      <div className="podium-col__score">{podium[1].score}</div>
                     </div>
                   )}
-                  {/* 1st */}
                   {podium[0] && (
                     <div
                       key={podium[0].id}
-                      className="flex-1 max-w-[280px] bg-[#FFD700] border border-[#FFD700]/80 rounded-t-3xl px-3 pt-8 pb-4 text-center shadow-xl"
+                      className="podium-col podium-col--1"
                     >
-                      <div className="text-4xl font-black text-[#0f1d45]">
-                        1st
-                      </div>
-                      <div className="mt-3 text-[#0f1d45] font-black text-xl truncate">
-                        {podium[0].name}
-                      </div>
-                      <div className="text-[#0f1d45] font-black text-lg mt-1">
+                      <div className="podium-col__rank1">1st</div>
+                      <div className="podium-col__name1">{podium[0].name}</div>
+                      <div className="podium-col__score1">
                         {podium[0].score}
                       </div>
                     </div>
                   )}
-                  {/* 3rd */}
                   {podium[2] && (
                     <div
                       key={podium[2].id}
-                      className="flex-1 max-w-[240px] bg-[#d97706]/25 border border-white/15 rounded-t-2xl px-3 pt-5 pb-3 text-center"
+                      className="podium-col podium-col--3"
                     >
-                      <div className="text-2xl font-black text-[#fdba74]">
-                        3rd
-                      </div>
-                      <div className="mt-2 text-white font-black text-lg truncate">
-                        {podium[2].name}
-                      </div>
-                      <div className="text-[#fdba74] font-black text-sm">
+                      <div className="podium-col__rank3">3rd</div>
+                      <div className="podium-col__name">{podium[2].name}</div>
+                      <div className="podium-col__score3">
                         {podium[2].score}
                       </div>
                     </div>
@@ -645,24 +601,16 @@ export default function Play() {
                 </div>
               )}
 
-              {/* others */}
               {rest.length > 0 && (
-                <div className="mt-8 w-full max-w-md flex flex-col gap-2">
+                <div className="podium-rest">
                   {rest.map((p, idx) => {
                     const place = idx + 4;
                     return (
-                      <div
-                        key={p.id}
-                        className="flex items-center gap-3 bg-white/10 border border-white/10 rounded-xl px-4 py-2.5"
-                      >
-                        <span className="w-10 shrink-0 text-white/60 font-black text-sm">
-                          {place}th
-                        </span>
-                        <span dir="auto" className="flex-1 text-white font-bold text-sm truncate">
-                          {p.name}
-                        </span>
+                      <div key={p.id} className="podium-rest__row">
+                        <span className="podium-rest__place">{place}th</span>
+                        <span className="podium-rest__name">{p.name}</span>
                         <span
-                          className={`font-black text-sm ml-auto ${p.score >= 0 ? "text-white" : "text-red-400"}`}
+                          className={`podium-rest__score ${p.score >= 0 ? "" : "podium-rest__score--neg"}`}
                         >
                           {p.score}
                         </span>
@@ -673,7 +621,7 @@ export default function Play() {
               )}
             </>
           ) : (
-            <p className="mt-10 text-white/60">No players played this game.</p>
+            <p className="podium-empty">No players played this game.</p>
           )}
         </div>
 
@@ -693,7 +641,7 @@ export default function Play() {
 
   return (
     <div
-      className="h-screen flex flex-col overflow-hidden"
+      className="play-shell"
       style={
         game.coverImageUrl?.trim()
           ? {
@@ -705,41 +653,25 @@ export default function Play() {
           : { background: "#0f1d45" }
       }
     >
-      {/* top left buttons */}
-      <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
-        <Link
-          to="/"
-          className="text-xs bg-white/15 hover:bg-white/25 text-white px-3 py-1.5 rounded-full"
-        >
+      <div className="play-top-left">
+        <Link to="/" className="btn-glass btn-xs">
           ← Home
         </Link>
-        <button
-          onClick={() => setSetupOpen(true)}
-          className="text-xs bg-white/15 hover:bg-white/25 text-white px-3 py-1.5 rounded-full"
-        >
+        <button onClick={() => setSetupOpen(true)} className="btn-glass btn-xs">
           Players
         </button>
-        <button
-          onClick={requestRestart}
-          className="text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-full"
-        >
+        <button onClick={requestRestart} className="btn-danger btn-xs">
           Restart
         </button>
       </div>
 
-      {/* top centered title */}
-      <header className="text-center pt-4 pb-2 px-4">
-        <div className="text-white font-black tracking-tight text-xl md:text-2xl">
-          {EVENT_NAME}
-        </div>
-        <div className="text-[#FFD700] font-bold text-lg mt-1">
-          {displayTitle}
-        </div>
+      <header className="play-header">
+        <div className="play-header__title">{EVENT_NAME}</div>
+        <div className="play-header__sub">{displayTitle}</div>
       </header>
 
-      {/* top right board pills */}
       {!setupOpen && (
-        <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+        <div className="play-top-right">
           {(["jeopardy", "double", "final"] as BoardId[]).map((bid) => {
             const b = game.boards[bid];
             if (!b.enabled) return null;
@@ -776,7 +708,7 @@ export default function Play() {
                     });
                   }
                 }}
-                className={`px-4 py-1.5 rounded-full text-xs font-black border ${currentBoard === bid ? "bg-[#FFD700] border-[#FFD700] text-[#0f1d45]" : "bg-white/10 border-white/20 text-white hover:bg-white/20"}`}
+                className={`pill-tab ${currentBoard === bid ? "pill-tab--active" : "pill-tab--idle"}`}
               >
                 {bid === "jeopardy"
                   ? "Jeopardy"
@@ -792,20 +724,18 @@ export default function Play() {
         </div>
       )}
 
-      {/* main area */}
-      <div className="flex-1 flex min-h-0 overflow-hidden">
-        <div className="flex-1 min-h-0 overflow-hidden">
-          <main className="h-full flex flex-col px-4 py-4">
-            {/* board complete banner */}
+      <div className="play-main">
+        <div className="play-main__sub">
+          <main className="play-main__inner">
             {isBoardComplete && !setupOpen && !activeClue && (
-              <div className="mb-4 bg-[#FFD700] text-[#0f1d45] rounded-2xl p-5 flex flex-col md:flex-row items-center justify-between gap-3 shadow">
+              <div className="play-banner">
                 <div>
-                  <h3 className="font-black text-lg">
+                  <h3 className="play-banner__title">
                     {currentBoard === "jeopardy"
                       ? "Jeopardy Complete!"
                       : "Double Jeopardy Complete!"}
                   </h3>
-                  <p className="text-sm font-medium opacity-80">
+                  <p className="play-banner__sub">
                     {game.boards.double.enabled && currentBoard === "jeopardy"
                       ? "Continue to Double Jeopardy or stay here."
                       : game.boards.final.enabled && currentBoard !== "final"
@@ -813,7 +743,7 @@ export default function Play() {
                         : "Game complete — review scores below."}
                   </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="play-banner__actions">
                   {game.boards.double.enabled &&
                     currentBoard === "jeopardy" && (
                       <button
@@ -827,16 +757,13 @@ export default function Play() {
                             "playing",
                           );
                         }}
-                        className="bg-[#0f1d45] text-white px-6 py-2.5 rounded-full font-black text-sm"
+                        className="btn-banner-dark"
                       >
                         Go to Double →
                       </button>
                     )}
                   {game.boards.final.enabled && (
-                    <button
-                      onClick={startFinal}
-                      className="bg-white text-[#0f1d45] px-6 py-2.5 rounded-full font-black text-sm border-2 border-[#0f1d45]"
-                    >
+                    <button onClick={startFinal} className="btn-banner-white">
                       Final Jeopardy
                     </button>
                   )}
@@ -853,7 +780,7 @@ export default function Play() {
                         },
                       });
                     }}
-                    className="bg-white/70 text-[#0f1d45] px-5 py-2.5 rounded-full font-bold text-sm"
+                    className="btn-banner-ghost"
                   >
                     End
                   </button>
@@ -861,19 +788,18 @@ export default function Play() {
               </div>
             )}
 
-            {/* board grid */}
             {currentBoard === "final" &&
             game.boards.final.enabled &&
             finalPhase === null ? (
-              <div className="bg-white/10 backdrop-blur border border-white/20 rounded-2xl p-8 text-center">
-                <p className="text-white font-black text-2xl">Final Jeopardy</p>
-                <p dir="auto" className="text-white/70 mt-2">
+              <div className="play-final-cta">
+                <p className="play-final-cta__title">Final Jeopardy</p>
+                <p dir="auto" className="play-final-cta__cat">
                   Category: {game.boards.final.categories[0]?.title}
                 </p>
                 <button
                   onClick={startFinal}
                   disabled={players.length === 0}
-                  className="mt-6 bg-[#FFD700] text-[#0f1d45] px-8 py-3 rounded-full font-black disabled:opacity-50"
+                  className="btn btn-gold btn-gold--big play-final-cta__start"
                 >
                   Start Final (enter wagers)
                 </button>
@@ -896,17 +822,17 @@ export default function Play() {
                       setWagerState(null);
                     }
                   }}
-                  className="block mx-auto mt-3 text-white/80 underline text-sm"
+                  className="play-final-cta__reveal"
                 >
                   Reveal without wagers
                 </button>
               </div>
             ) : currentBoard === "final" ? (
-              <div className="text-center py-10 text-white/60">
-                Final Jeopardy in progress — see clue modal.
+              <div className="play-final-progress">
+                Final Jeopardy in progress — see clue.
               </div>
             ) : (
-              <div className="flex-1 min-h-0">
+              <div className="play-board-wrap">
                 <BoardPlayGrid
                   board={board}
                   answeredIds={answeredIds}
@@ -917,12 +843,9 @@ export default function Play() {
           </main>
         </div>
 
-        {/* right sidebar */}
-        <div className="shrink-0 w-[130px] border-l border-white/10 overflow-y-auto p-2 flex flex-col gap-1">
+        <div className="play-sidebar">
           {players.length === 0 ? (
-            <p className="text-white/40 text-xs text-center mt-8">
-              No players yet
-            </p>
+            <p className="play-sidebar__none">No players yet</p>
           ) : (
             players.map((p, idx) => (
               <button
@@ -931,24 +854,16 @@ export default function Play() {
                   setEditingPlayer(p);
                   setEditScore(String(p.score));
                 }}
-                className={`w-full text-left rounded-lg px-2 py-1.5 transition cursor-pointer ${
-                  idx === currentTurnIndex
-                    ? "border-l-4 border-[#FFD700] bg-white/10"
-                    : "border-l-4 border-transparent hover:bg-white/5"
-                }`}
+                className={`play-sidebar__row ${idx === currentTurnIndex ? "play-sidebar__row--active" : "play-sidebar__row--idle"}`}
               >
-                <div dir="auto" className="font-bold text-xs text-white truncate leading-tight">
-                  {p.name}
-                </div>
+                <div className="play-sidebar__name">{p.name}</div>
                 <div
-                  className={`font-black text-xs mt-0.5 leading-tight ${p.score >= 0 ? "text-white" : "text-red-400"}`}
+                  className={`play-sidebar__score ${p.score >= 0 ? "" : "play-sidebar__score--neg"}`}
                 >
                   {p.score}
                 </div>
                 {idx === currentTurnIndex && (
-                  <div className="text-[10px] text-[#FFD700] font-bold mt-0.5">
-                    ▸ picks next
-                  </div>
+                  <div className="play-sidebar__picks">▸ picks next</div>
                 )}
               </button>
             ))
@@ -956,59 +871,43 @@ export default function Play() {
         </div>
       </div>
 
-      {/* Player setup modal */}
       {setupOpen && (
-        <div className="fixed inset-0 z-40 flex items-start justify-center pt-[10vh] p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-[420px] overflow-hidden">
-            <div className="bg-[#0f1d45] text-white p-5 text-center">
-              <h3 className="font-black text-lg">Add Teams / Players</h3>
-              <p className="text-white/70 text-xs mt-1">
-                Type a name and press Add — add as many as you like
-              </p>
+        <div className="setup-modal">
+          <div className="modal-scrim modal-scrim--strong" />
+          <div className="setup-modal__card">
+            <div className="setup-modal__header">
+              <h3>Add Teams</h3>
             </div>
-            <div className="p-5">
-              <div className="flex gap-2">
+            <div className="setup-modal__body">
+              <div className="setup-add-row">
                 <input
                   dir="auto"
                   value={newPlayerName}
                   onChange={(e) => setNewPlayerName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleAddPlayer()}
                   placeholder="Team name"
-                  className="flex-1 border border-slate-300 rounded-full px-4 py-2.5 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0f1d45]"
+                  className="text-input text-input--round"
                 />
-                <button
-                  onClick={handleAddPlayer}
-                  className="bg-[#0f1d45] hover:bg-[#1a2d5c] text-white font-black px-6 py-2.5 rounded-full text-sm"
-                >
+                <button onClick={handleAddPlayer} className="btn-navy">
                   Add
                 </button>
               </div>
 
-              <div className="mt-4 min-h-[80px]">
+              <div className="setup-list">
                 {players.length === 0 ? (
-                  <p className="text-sm text-slate-400 text-center py-6 border border-dashed rounded-xl">
-                    No teams yet
-                  </p>
+                  <p className="setup-empty">No teams yet</p>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="setup-list__rows">
                     {players.map((p) => (
-                      <div
-                        key={p.id}
-                        className="flex items-center gap-3 border border-slate-200 rounded-xl px-3 py-2"
-                      >
-                        <div className="w-8 h-8 rounded-full bg-[#FFD700] text-[#0f1d45] flex items-center justify-center font-black text-sm">
+                      <div key={p.id} className="setup-player-row">
+                        <div className="setup-avatar">
                           {p.name.trim().charAt(0).toUpperCase() || "?"}
                         </div>
-                        <span dir="auto" className="flex-1 font-bold text-slate-800 text-sm">
-                          {p.name}
-                        </span>
-                        <span className="text-sm font-black text-[#0f1d45]">
-                          {p.score}
-                        </span>
+                        <span className="setup-player-name">{p.name}</span>
+                        <span className="setup-player-score">{p.score}</span>
                         <button
                           onClick={() => handleRemovePlayer(p.id)}
-                          className="w-7 h-7 rounded-full bg-slate-100 hover:bg-red-600 hover:text-white flex items-center justify-center"
+                          className="icon-btn icon-btn--sm icon-btn--slate"
                         >
                           <XIcon size={10} />
                         </button>
@@ -1019,21 +918,15 @@ export default function Play() {
               </div>
 
               {players.length > 0 && (
-                <div className="mt-4">
-                  <p className="text-xs font-black tracking-widest text-slate-500 mb-2">
-                    WHO PICKS FIRST?
-                  </p>
-                  <div className="flex flex-wrap gap-2">
+                <div className="setup-picks">
+                  <p className="setup-picks__label">WHO STARTS?</p>
+                  <div className="setup-picks__buttons">
                     {players.map((p, idx) => (
                       <button
                         key={p.id}
                         dir="auto"
                         onClick={() => setSetupFirstPlayer(idx)}
-                        className={`px-3 py-1.5 rounded-full text-xs font-bold border transition ${
-                          setupFirstPlayer === idx
-                            ? "bg-[#FFD700] border-[#FFD700] text-[#0f1d45]"
-                            : "bg-white border-slate-200 text-slate-600 hover:border-slate-400"
-                        }`}
+                        className={`setup-pick-btn ${setupFirstPlayer === idx ? "setup-pick-btn--active" : "setup-pick-btn--idle"}`}
                       >
                         {p.name}
                       </button>
@@ -1044,14 +937,14 @@ export default function Play() {
 
               <button
                 onClick={handleStart}
-                className="mt-6 w-full bg-[#FFD700] hover:bg-[#ffdf33] text-[#0f1d45] font-black py-3 rounded-full shadow text-center"
+                className="btn btn-gold btn-gold--big setup-start"
               >
                 Start
               </button>
               {players.length > 0 && (
                 <button
                   onClick={() => setSetupOpen(false)}
-                  className="mt-2 w-full text-slate-500 text-sm underline"
+                  className="setup-continue"
                 >
                   Continue without adding
                 </button>
@@ -1061,55 +954,44 @@ export default function Play() {
         </div>
       )}
 
-      {/* Score edit modal */}
       {editingPlayer && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setEditingPlayer(null)}
-          />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-[400px] overflow-hidden">
-            <div className="p-6 text-center">
-              <h3 dir="auto" className="font-black text-xl text-slate-900">
+        <div className="modal-backdrop">
+          <div className="modal-scrim" onClick={() => setEditingPlayer(null)} />
+          <div className="modal-card">
+            <div className="score-modal__body">
+              <h3 dir="auto" className="score-modal__name">
                 {editingPlayer.name}
               </h3>
-              <div className="mt-5 flex items-center justify-center gap-3">
-                <label className="text-sm font-bold text-slate-600">
-                  Score
-                </label>
+              <div className="score-modal__row">
+                <label className="score-modal__label">Score</label>
                 <input
                   value={editScore}
                   onChange={(e) =>
                     setEditScore(e.target.value.replace(/[^0-9-]/g, ""))
                   }
-                  className="w-28 border border-slate-300 rounded-xl px-4 py-2.5 text-lg font-black text-center focus:outline-none focus:ring-2 focus:ring-[#0f1d45]"
+                  className="score-modal__input"
                 />
-                <button
-                  onClick={handleUpdateScore}
-                  className="bg-[#0f1d45] hover:bg-[#1a2d5c] text-white font-black px-5 py-2.5 rounded-full text-sm"
-                >
+                <button onClick={handleUpdateScore} className="btn-navy">
                   Update score
                 </button>
               </div>
-              <div className="mt-4">
-                <p className="text-xs text-slate-400">
-                  {currentTurnIndex ===
-                  players.findIndex((p) => p.id === editingPlayer.id) ? (
-                    <span className="text-[#FFD700] font-bold">
-                      This player chooses the next question
-                    </span>
-                  ) : (
-                    ""
-                  )}
-                </p>
+              <div className="score-modal__turn">
+                {currentTurnIndex ===
+                players.findIndex((p) => p.id === editingPlayer.id) ? (
+                  <span className="score-modal__turn-gold">
+                    This player chooses the next question
+                  </span>
+                ) : (
+                  ""
+                )}
               </div>
             </div>
-            <div className="border-t border-slate-200 p-4 text-center">
-<button
-                  dir="auto"
-                  onClick={() => {
-                    setConfirmModal({
-                      title: `Remove ${editingPlayer.name}?`,
+            <div className="score-modal__footer">
+              <button
+                dir="auto"
+                onClick={() => {
+                  setConfirmModal({
+                    title: `Remove ${editingPlayer.name}?`,
                     message:
                       "This player will be removed from the game. Their score will be lost.",
                     confirmLabel: "Remove",
@@ -1121,7 +1003,7 @@ export default function Play() {
                     },
                   });
                 }}
-                className="text-red-600 hover:text-red-700 font-bold text-sm"
+                className="btn-danger-text"
               >
                 Remove {editingPlayer.name} from this game
               </button>
@@ -1130,32 +1012,24 @@ export default function Play() {
         </div>
       )}
 
-      {/* Clue big card */}
       {activeClue && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-[#0f1d45]">
+        <div className="play-clue">
           {wagerState && wagerState.step === "pick" ? (
             wagerState.mode === "final" ? (
-              <div className="flex-1 flex items-center justify-center p-6 bg-[#0f1d45]">
-                <div className="bg-white rounded-2xl p-6 w-full max-w-[520px] shadow-2xl">
-                  <h3 className="font-black text-2xl text-center text-[#0f1d45]">
-                    FINAL JEOPARDY
-                  </h3>
-                  <p className="text-center text-slate-600 text-sm mt-1">
+              <div className="wager-backdrop">
+                <div className="wager-card wager-card--fj">
+                  <h3 className="wager-card__title">FINAL JEOPARDY</h3>
+                  <p className="wager-card__sub">
                     Set each team's wager. Zero means no wager.
                   </p>
-                  <div className="mt-5 space-y-2 max-h-[50vh] overflow-y-auto">
+                  <div className="wager-list">
                     {players.map((p) => (
-                      <div
-                        key={p.id}
-                        className="flex items-center gap-3 border border-slate-200 rounded-xl px-3 py-2"
-                      >
-                        <span dir="auto" className="flex-1 font-bold text-sm text-slate-800 truncate">
+                      <div key={p.id} className="wager-row">
+                        <span className="wager-row__name">
                           {p.name}{" "}
-                          <span className="font-normal text-slate-400 text-xs">
-                            (${p.score})
-                          </span>
+                          <span className="wager-row__score">({p.score})</span>
                         </span>
-                        <div className="flex items-center gap-1 shrink-0">
+                        <div className="wager-row__toggle-wrap">
                           <input
                             value={finalWagers[p.id] ?? "0"}
                             onChange={(e) =>
@@ -1164,22 +1038,22 @@ export default function Play() {
                                 [p.id]: e.target.value.replace(/[^0-9]/g, ""),
                               })
                             }
-                            className="w-24 border border-slate-300 rounded-lg px-2 py-1.5 text-sm font-black text-right focus:outline-none focus:ring-2 focus:ring-[#0f1d45]"
+                            className="wager-row__input"
                           />
                         </div>
                       </div>
                     ))}
                   </div>
-                  <div className="mt-6 flex gap-3">
+                  <div className="wager-actions">
                     <button
                       onClick={() => closeClue(false)}
-                      className="flex-1 border border-slate-300 rounded-full py-3 font-bold text-sm"
+                      className="wager-btn wager-btn--ghost"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleWagerConfirm}
-                      className="flex-1 bg-[#FFD700] text-[#0f1d45] rounded-full py-3 font-black text-sm"
+                      className="wager-btn wager-btn--gold"
                     >
                       Reveal Clue →
                     </button>
@@ -1187,18 +1061,14 @@ export default function Play() {
                 </div>
               </div>
             ) : (
-              <div className="flex-1 flex items-center justify-center p-6 bg-[#0f1d45]">
-                <div className="bg-white rounded-2xl p-6 w-full max-w-[480px] shadow-2xl">
-                  <h3 className="font-black text-2xl text-center text-[#0f1d45]">
-                    DAILY DOUBLE!
-                  </h3>
-                  <p className="text-center text-slate-600 text-sm mt-1">
+              <div className="wager-backdrop">
+                <div className="wager-card wager-card--dd">
+                  <h3 className="wager-card__title">DAILY DOUBLE!</h3>
+                  <p className="wager-card__sub">
                     {`${players.find((p) => p.id === wagerState.playerId)?.name ?? ""} — enter wager (host decides cap).`}
                   </p>
-                  <div className="mt-5 space-y-3">
-                    <label className="block text-xs font-black tracking-widest text-slate-500">
-                      WAGER
-                    </label>
+                  <div className="wager-field">
+                    <label className="field-label">WAGER</label>
                     <input
                       value={wagerState.amount}
                       onChange={(e) =>
@@ -1208,19 +1078,19 @@ export default function Play() {
                         })
                       }
                       placeholder="e.g. 500"
-                      className="w-full border border-slate-300 rounded-xl px-4 py-3 text-lg font-black placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0f1d45]"
+                      className="text-input text-input--lg"
                     />
                   </div>
-                  <div className="mt-6 flex gap-3">
+                  <div className="wager-actions">
                     <button
                       onClick={() => closeClue(false)}
-                      className="flex-1 border border-slate-300 rounded-full py-3 font-bold text-sm"
+                      className="wager-btn wager-btn--ghost"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleWagerConfirm}
-                      className="flex-1 bg-[#FFD700] text-[#0f1d45] rounded-full py-3 font-black text-sm"
+                      className="wager-btn wager-btn--gold"
                     >
                       Reveal Clue →
                     </button>
@@ -1232,18 +1102,18 @@ export default function Play() {
             <>
               <button
                 onClick={handleVoid}
-                className="absolute top-4 right-4 z-10 w-20 h-20 rounded-full bg-white/15 hover:bg-red-600 text-white flex items-center justify-center backdrop-blur"
+                className="icon-btn icon-btn--md icon-btn--glass-lg play-clue__void"
                 aria-label="Void question"
               >
-                <XIcon size={30} />
+                <XIcon size={20} />
               </button>
 
-              <div className="flex-1 flex items-center justify-center p-6 md:p-10 overflow-auto">
+              <div className="play-clue__center">
                 <div
-                  className={`bg-white rounded-3xl shadow-2xl w-full max-w-[85vw] min-h-[85vh] flex flex-col p-6 md:p-10 relative transition-colors duration-1000 ${flashRed ? "bg-[#fecaca]" : "bg-white"}`}
+                  className={`cluecard ${flashRed ? "cluecard--flash" : ""}`}
                 >
-                  <div className="text-center">
-                    <div className="inline-flex items-center gap-4 bg-[#0f1d45] text-white px-8 py-3 rounded-full text-2xl font-black tracking-widest">
+                  <div className="cluecard__top">
+                    <div className="cluecard__label">
                       {activeClue.boardId === "final"
                         ? "FINAL JEOPARDY · WAGER"
                         : activeClue.boardId === "double"
@@ -1253,13 +1123,13 @@ export default function Play() {
                         `· ${wagerState?.step === "reveal" ? Number(wagerState.amount) : getClueValue(activeClue.clue, activeClue.rowIdx, activeClue.boardId)}`}
                     </div>
                     {activeClue.clue.isDailyDouble && (
-                      <span className="ml-4 inline-block bg-red-600 text-white px-6 py-2 rounded-full text-2xl font-black">
+                      <span className="badge-dd badge-dd--xl">
                         DAILY DOUBLE
                       </span>
                     )}
                     {activeClue.boardId === "double" ||
                     activeClue.boardId === "jeopardy" ? (
-                      <p dir="auto" className="text-2xl font-bold tracking-widest text-slate-500 mt-4">
+                      <p dir="auto" className="cluecard__cat">
                         {
                           game.boards[activeClue.boardId].categories[
                             activeClue.catIdx
@@ -1267,48 +1137,45 @@ export default function Play() {
                         }
                       </p>
                     ) : (
-                      <p dir="auto" className="text-2xl font-bold tracking-widest text-slate-500 mt-4">
+                      <p dir="auto" className="cluecard__cat">
                         {game.boards.final.categories[0]?.title}
                       </p>
                     )}
                   </div>
 
-                  <div className="flex-1 flex flex-col items-center justify-center py-12">
-                    <p dir="auto" className="text-5xl md:text-7xl font-black text-slate-900 text-center leading-tight max-w-[70vw]">
+                  <div className="cluecard__body">
+                    <p dir="auto" className="cluecard__q">
                       {activeClue.clue.question ||
                         "(No question set — edit this clue)"}
                     </p>
 
                     {activeClue.clue.media.length > 0 && (
-                      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-[70vw]">
+                      <div className="cluecard__media">
                         {activeClue.clue.media.map((m) => (
-                          <div
-                            key={m.id}
-                            className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50"
-                          >
+                          <div key={m.id} className="cluecard__media-item">
                             {m.type === "image" && m.url.trim() && (
                               <img
                                 src={m.url}
                                 alt=""
-                                className="w-full max-h-[640px] object-contain bg-black"
+                                className="cluecard__media-frame"
                               />
                             )}
                             {m.type === "video" && m.url.trim() && (
                               <video
                                 src={m.url}
                                 controls
-                                className="w-full max-h-[640px] bg-black"
+                                className="cluecard__media-frame"
                               />
                             )}
                             {m.type === "audio" && m.url.trim() && (
                               <audio
                                 src={m.url}
                                 controls
-                                className="w-full p-6"
+                                className="cluecard__media-audio"
                               />
                             )}
                             {!m.url.trim() && (
-                              <div className="p-4 text-2xl text-slate-400">
+                              <div className="cluecard__media-empty">
                                 Empty {m.type} URL
                               </div>
                             )}
@@ -1318,20 +1185,18 @@ export default function Play() {
                     )}
                   </div>
 
-                  <div className="pt-8 pb-5 flex flex-col items-center gap-6">
+                  <div className="cluecard__answer-zone">
                     {!showAnswer ? (
                       <button
                         onClick={() => setShowAnswer(true)}
-                        className="bg-slate-900 hover:bg-black text-white px-12 py-5 rounded-full font-bold text-3xl"
+                        className="btn-solid-dark"
                       >
                         Show Answer
                       </button>
                     ) : (
-                      <div className="bg-[#FFD700]/20 border-2 border-[#FFD700] rounded-2xl px-12 py-8 w-full max-w-[40vw] text-center">
-                        <p className="text-2xl font-black tracking-widest text-slate-600">
-                          ANSWER
-                        </p>
-                        <p dir="auto" className="text-4xl font-black text-slate-900 mt-2">
+                      <div className="cluecard__answer-box">
+                        <p className="cluecard__answer-label">ANSWER</p>
+                        <p dir="auto" className="cluecard__answer-text">
                           {activeClue.clue.answer || "(No answer set)"}
                         </p>
                       </div>
@@ -1340,24 +1205,22 @@ export default function Play() {
                       finalPhase === "clue" && (
                         <button
                           onClick={finishFinalClue}
-                          className="bg-[#0f1d45] text-white px-12 py-5 rounded-full font-black text-3xl mt-2"
+                          className="play-clue__final-btn"
                         >
                           Close & Score Final →
                         </button>
                       )}
                   </div>
 
-                  {/* bottom left countdown */}
                   {timeLeft != null && activeClue.boardId !== "final" && (
                     <div
-                      className={`absolute bottom-4 left-4 z-10 rounded-full px-8 py-4 text-3xl font-black tracking-widest shadow-lg ${timeLeft <= 5 ? "bg-red-600 text-white animate-pulse" : "bg-slate-900 text-white"}`}
+                      className={`countdown-pill ${timeLeft <= 5 ? "countdown-pill--low" : ""}`}
                     >
                       {timeLeft}s
                     </div>
                   )}
 
-                  {/* bottom right team panel */}
-                  <div className="absolute bottom-4 right-4 flex flex-col gap-2">
+                  <div className="play-clue__bottom-right">
                     {(activeClue.clue.isDailyDouble &&
                     activeClue.boardId !== "final"
                       ? players.filter((_, idx) => idx === currentTurnIndex)
@@ -1367,22 +1230,17 @@ export default function Play() {
                     ).map((p) => {
                       if (removedFromClue.has(p.id)) return null;
                       return (
-                        <div
-                          key={p.id}
-                          className="group flex items-center gap-4 bg-slate-900 text-white rounded-full pl-6 pr-2 py-2 shadow-lg border border-white/10 min-w-[280px] justify-between"
-                        >
-                          <span dir="auto" className="font-bold text-3xl truncate">
-                            {p.name}
-                          </span>
-                          <div className="flex gap-2 shrink-0">
-                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                        <div key={p.id} className="answer-frame">
+                          <span className="answer-frame__name">{p.name}</span>
+                          <div className="answer-frame__actions">
+                            <div className="answer-frame__hov">
                               <button
                                 onClick={() => {
                                   if (activeClue.boardId === "final") {
                                     handleFinalClueTick(p.id);
                                   } else handleTick(p.id);
                                 }}
-                                className="w-14 h-14 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center text-2xl font-black"
+                                className="answer-frame__btn answer-frame__btn--ok"
                                 title="Correct (+)"
                               >
                                 ✓
@@ -1393,7 +1251,7 @@ export default function Play() {
                                     handleFinalClueWrong(p.id);
                                   } else handleWrong(p.id);
                                 }}
-                                className="w-14 h-14 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center"
+                                className="answer-frame__btn answer-frame__btn--no"
                                 title="Wrong (-)"
                               >
                                 <XIcon size={20} />
@@ -1404,13 +1262,13 @@ export default function Play() {
                       );
                     })}
                     {players.length === 0 && (
-                      <span className="text-white/60 text-2xl">
+                      <span className="play-clue__noplayers">
                         Add players first
                       </span>
                     )}
                   </div>
 
-                  <p className="absolute bottom-4 left-1/2 -translate-x-1/2 text-2xl text-slate-400 hidden md:block">
+                  <p className="pickswipe-hint">
                     Hover a team on the bottom right to award ✓ or ✕ — × top
                     right voids
                   </p>
@@ -1452,56 +1310,39 @@ function BoardPlayGrid({
   if (!board) return null;
   const cols = board.categories.length;
   const showCats = board.showCategories;
-  const ROW_LABEL_W = 24;
-  const GAP = 8;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="bpg">
       {showCats && (
-        <div className="flex mb-2 shrink-0" style={{ gap: GAP }}>
-          <div className="shrink-0" style={{ width: ROW_LABEL_W }} />
+        <div className="bpg-cats">
+          <div className="bpg-spacer" />
           <div
-            className="flex-1 grid"
-            style={{ gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: GAP }}
+            className="bpg-cats-grid"
+            style={{ "--cols": cols } as CSSProperties}
           >
             {board.categories.map((cat) => (
-              <div
-                key={cat.id}
-                className="bg-[#0f1d45] border-2 border-[#FFD700]/30 rounded-xl p-2 min-h-[40px] flex items-center justify-center text-center"
-              >
-                <span dir="auto" className="text-white font-black text-xs sm:text-sm leading-tight">
-                  {cat.title}
-                </span>
+              <div key={cat.id} className="bpg-cat">
+                <span dir="auto">{cat.title}</span>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      <div className="flex-1 min-h-0 flex flex-col" style={{ gap: GAP }}>
+      <div className="bpg-body">
         {Array.from({ length: board.categories[0]?.clues.length ?? 0 }).map(
           (_, rowIdx) => (
-            <div
-              key={rowIdx}
-              className="flex-1 min-h-0 flex"
-              style={{ gap: GAP }}
-            >
-              <div
-                className="shrink-0 flex items-center justify-center"
-                style={{ width: ROW_LABEL_W }}
-              >
-                <span className="text-white/40 text-[10px] font-bold tracking-wider [writing-mode:vertical-lr] rotate-180 select-none">
+            <div key={rowIdx} className="bpg-row">
+              <div className="bpg-row-label">
+                <span>
                   {board.id === "jeopardy"
                     ? (rowIdx + 1) * 100
                     : (rowIdx + 1) * 200}
                 </span>
               </div>
               <div
-                className="flex-1 grid min-h-0"
-                style={{
-                  gridTemplateColumns: `repeat(${cols}, 1fr)`,
-                  gap: GAP,
-                }}
+                className="bpg-cells"
+                style={{ "--cols": cols } as CSSProperties}
               >
                 {board.categories.map((cat, colIdx) => {
                   const clue = cat.clues[rowIdx];
@@ -1514,13 +1355,9 @@ function BoardPlayGrid({
                       onClick={() =>
                         onClueClick(colIdx, rowIdx, clue, board.id)
                       }
-                      className={`rounded-xl border-2 min-h-0 min-w-0 flex items-center justify-center text-center transition
-                      ${answered ? "opacity-0 pointer-events-none" : "bg-[#0f1d45] border-[#1a2d5c] hover:border-[#FFD700] hover:bg-[#1a2d5c] text-[#FFD700] cursor-pointer"}
-                    `}
+                      className={`bpg-cell ${answered ? "bpg-cell--answered" : ""}`}
                     >
-                      <span className="font-black text-lg sm:text-2xl md:text-3xl tracking-tight drop-shadow">
-                        {value}
-                      </span>
+                      {value}
                     </button>
                   );
                 })}

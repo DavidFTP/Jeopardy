@@ -1,0 +1,48 @@
+.confirm-content {
+  padding: 24px;
+}
+
+.confirm-title {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--slate-900);
+}
+
+.confirm-msg {
+  font-size: 14px;
+  color: var(--slate-600);
+  margin-top: 8px;
+}
+
+.confirm-actions {
+  display: flex;
+  border-top: 1px solid var(--slate-200);
+}
+
+.confirm-btn {
+  flex: 1;
+  padding: 12px 16px;
+  font-size: 14px;
+  transition: background-color var(--t-fast), color var(--t-fast);
+}
+.confirm-btn--cancel {
+  color: var(--slate-600);
+  font-weight: 700;
+}
+.confirm-btn--cancel:hover {
+  background: var(--slate-50);
+}
+.confirm-btn--confirm {
+  font-weight: 900;
+  color: var(--white);
+  background: var(--navy-900);
+}
+.confirm-btn--confirm:hover {
+  background: var(--navy-800);
+}
+.confirm-btn--confirm.confirm-btn--danger {
+  background: var(--danger);
+}
+.confirm-btn--confirm.confirm-btn--danger:hover {
+  background: var(--danger-hover);
+}

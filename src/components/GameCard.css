@@ -1,0 +1,150 @@
+.game-card {
+  position: relative;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  display: flex;
+  flex-direction: column;
+  min-height: 190px;
+}
+
+.game-card__bg-img {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+}
+.game-card__bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgb(15 29 69 / 0.65);
+}
+.game-card__bg-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--navy-800), var(--navy-900));
+}
+
+.game-card__badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: var(--gold);
+  color: var(--navy-900);
+  font-size: 11px;
+  font-weight: 900;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  letter-spacing: 0.1em;
+}
+
+.game-card__delete {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.35);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  transition: background-color var(--t-fast);
+}
+.game-card__delete:hover {
+  background: var(--danger);
+}
+
+.game-card__body {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  padding-top: 40px;
+}
+
+.game-card__title {
+  color: var(--white);
+  font-weight: 900;
+  font-size: 20px;
+  text-align: center;
+  line-height: 1.25;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.6);
+}
+@media (min-width: 768px) {
+  .game-card__title {
+    font-size: 24px;
+  }
+}
+
+.game-card__meta {
+  margin-top: 8px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.game-card__meta span {
+  color: rgb(255 255 255 / 0.7);
+  font-size: 12px;
+}
+
+.game-card__actions {
+  position: relative;
+  padding: 12px;
+  padding-top: 0;
+  display: flex;
+  gap: 8px;
+}
+
+.game-card__btn {
+  flex: 1;
+  border-radius: var(--r-pill);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 8px 16px;
+  transition: background-color var(--t-fast), color var(--t-fast);
+  cursor: pointer;
+}
+
+.game-card__btn--edit {
+  background: rgb(255 255 255 / 0.15);
+  color: var(--white);
+  border: 1px solid rgb(255 255 255 / 0.2);
+  backdrop-filter: blur(4px);
+}
+.game-card__btn--edit:hover {
+  background: rgb(255 255 255 / 0.25);
+}
+
+.game-card__btn--play {
+  background: var(--gold);
+  color: var(--navy-900);
+  font-weight: 900;
+  box-shadow: var(--shadow-md);
+}
+.game-card__btn--play:hover {
+  background: var(--gold-light);
+}
+
+.game-card__restart {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  background: var(--danger);
+  color: var(--white);
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: var(--r-pill);
+  transition: background-color var(--t-fast);
+  cursor: pointer;
+}
+.game-card__restart:hover {
+  background: var(--danger-hover);
+}

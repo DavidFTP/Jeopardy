@@ -1,3 +1,4 @@
+import "./GameCard.css";
 import type { Game } from "../types/game";
 
 export function GameCard({
@@ -22,43 +23,36 @@ export function GameCard({
   const title = game.title.trim() || `Game ${index + 1}`;
   const hasImage = !!game.coverImageUrl?.trim();
   return (
-    <div className="relative rounded-2xl overflow-hidden shadow-lg border border-white/10 flex flex-col min-h-[190px]">
-      {/* background */}
+    <div className="game-card">
       {hasImage ? (
         <>
           <div
-            className="absolute inset-0 bg-cover bg-center"
+            className="game-card__bg-img"
             style={{ backgroundImage: `url(${game.coverImageUrl})` }}
           />
-          <div className="absolute inset-0 bg-[#0f1d45]/65" />
+          <div className="game-card__bg-overlay" />
         </>
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1a2d5c] to-[#0f1d45]" />
+        <div className="game-card__bg-gradient" />
       )}
 
-      {/* playing badge */}
-      {isPlaying && (
-        <span className="absolute top-3 left-3 bg-[#FFD700] text-[#0f1d45] text-[11px] font-black px-2.5 py-1 rounded-full tracking-widest">
-          PLAYING
-        </span>
-      )}
+      {isPlaying && <span className="game-card__badge">PLAYING</span>}
 
-      {/* delete trash */}
       <button
-        onClick={(e) => { e.stopPropagation(); onDelete(); }}
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete();
+        }}
         aria-label="Delete game"
-        className="absolute top-2.5 right-2.5 z-10 w-8 h-8 rounded-full bg-black/35 hover:bg-red-600 text-white flex items-center justify-center backdrop-blur transition"
+        className="game-card__delete"
       >
         <TrashIcon />
       </button>
 
-      {/* title */}
-      <div className="relative flex-1 flex flex-col items-center justify-center p-6 pt-10">
-        <h3 className="text-white font-black text-xl md:text-2xl text-center leading-tight drop-shadow">
-          {title}
-        </h3>
-        <div className="mt-2 flex gap-1.5 flex-wrap justify-center">
-          <span className="text-white/70 text-xs">
+      <div className="game-card__body">
+        <h3 className="game-card__title">{title}</h3>
+        <div className="game-card__meta">
+          <span>
             {game.boards.jeopardy.categories.length}×
             {game.boards.jeopardy.categories[0]?.clues.length ?? 0}
             {game.boards.double.enabled ? " + Double" : ""}
@@ -67,25 +61,15 @@ export function GameCard({
         </div>
       </div>
 
-      {/* buttons */}
-      <div className="relative p-3 pt-0 flex gap-2">
-        <button
-          onClick={onEdit}
-          className="flex-1 bg-white/15 hover:bg-white/25 backdrop-blur text-white font-bold text-sm py-2 rounded-full border border-white/20 transition"
-        >
+      <div className="game-card__actions">
+        <button onClick={onEdit} className="game-card__btn game-card__btn--edit">
           Edit
         </button>
-        <button
-          onClick={onPlay}
-          className="flex-1 bg-[#FFD700] hover:bg-[#ffdf33] text-[#0f1d45] font-black text-sm py-2 rounded-full shadow transition"
-        >
+        <button onClick={onPlay} className="game-card__btn game-card__btn--play">
           {isPodium ? "Podium" : "Play"}
         </button>
         {(isPlaying || isPodium) && (
-          <button
-            onClick={onRestart}
-            className="px-4 bg-red-600 hover:bg-red-700 text-white font-bold text-sm py-2 rounded-full transition"
-          >
+          <button onClick={onRestart} className="game-card__restart">
             Restart
           </button>
         )}

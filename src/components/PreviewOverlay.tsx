@@ -1,3 +1,5 @@
+import "./PreviewOverlay.css";
+import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
 import type { BoardId, Clue, Game } from "../types/game";
 import { getClueValue } from "../types/game";
@@ -32,7 +34,6 @@ export function PreviewOverlay({
     setActiveClue({ clue, catIdx, rowIdx, boardId: currentBoard });
   };
 
-  // Reset countdown when a clue is revealed
   useEffect(() => {
     setFlashRed(false);
     if (!activeClue || activeClue.clue.timeLimit == null) {
@@ -42,14 +43,12 @@ export function PreviewOverlay({
     setTimeLeft(activeClue.clue.timeLimit);
   }, [activeClue]);
 
-  // countdown tick
   useEffect(() => {
     if (timeLeft == null || timeLeft <= 0) return;
     const t = setTimeout(() => setTimeLeft((s) => (s == null ? null : s - 1)), 1000);
     return () => clearTimeout(t);
   }, [timeLeft]);
 
-  // flash red when time hits zero, then return to original colour
   useEffect(() => {
     if (timeLeft !== 0) return;
     setFlashRed(true);
@@ -59,7 +58,7 @@ export function PreviewOverlay({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col overflow-hidden"
+      className="prev-root"
       style={
         game.coverImageUrl?.trim()
           ? {
@@ -71,26 +70,18 @@ export function PreviewOverlay({
           : { background: "#0f1d45" }
       }
     >
-      {/* top left */}
-      <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
-        <button
-          onClick={onClose}
-          className="text-xs bg-white/15 hover:bg-white/25 text-white px-3 py-1.5 rounded-full"
-        >
+      <div className="prev-top-left">
+        <button onClick={onClose} className="btn-glass">
           ← Back to Edit
         </button>
       </div>
 
-      {/* top centered title */}
-      <header className="text-center pt-4 pb-2 px-4">
-        <div className="text-white font-black tracking-tight text-xl md:text-2xl">
-          Preview
-        </div>
-        <div className="text-[#FFD700] font-bold text-lg mt-1">{displayTitle}</div>
+      <header className="prev-header">
+        <div className="prev-header__title">Preview</div>
+        <div className="prev-header__sub">{displayTitle}</div>
       </header>
 
-      {/* top right board pills */}
-      <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+      <div className="prev-top-right">
         {enabledBoards.map((bid) => (
           <button
             key={bid}
@@ -99,23 +90,18 @@ export function PreviewOverlay({
               setActiveClue(null);
               setShowAnswer(false);
             }}
-            className={`px-4 py-1.5 rounded-full text-xs font-black border ${
-              currentBoard === bid
-                ? "bg-[#FFD700] border-[#FFD700] text-[#0f1d45]"
-                : "bg-white/10 border-white/20 text-white hover:bg-white/20"
-            }`}
+            className={`pill-tab ${currentBoard === bid ? "pill-tab--active" : "pill-tab--idle"}`}
           >
             {bid === "jeopardy" ? "Jeopardy" : bid === "double" ? "Double" : "Final"}
           </button>
         ))}
       </div>
 
-      {/* main area */}
-      <div className="flex-1 flex min-h-0 overflow-hidden pt-6">
-        <div className="flex-1 min-h-0 overflow-hidden">
-          <main className="h-full flex flex-col px-4 py-4">
+      <div className="prev-main">
+        <div className="prev-main__sub">
+          <main className="prev-main__inner">
             {currentBoard === "final" ? (
-              <div className="flex-1 min-h-0">
+              <div className="prev-board-wrap">
                 <FinalPreview
                   board={game.boards.final}
                   onClueClick={(clue) => {
@@ -125,7 +111,7 @@ export function PreviewOverlay({
                 />
               </div>
             ) : (
-              <div className="flex-1 min-h-0">
+              <div className="prev-board-wrap">
                 <PreviewGrid board={board} onClueClick={handleClueClick} />
               </div>
             )}
@@ -133,21 +119,20 @@ export function PreviewOverlay({
         </div>
       </div>
 
-      {/* Clue card */}
       {activeClue && (
-        <div className="fixed inset-0 z-10 flex flex-col bg-[#0f1d45]">
+        <div className="prev-clue">
           <button
             onClick={() => setActiveClue(null)}
-            className="absolute top-4 right-4 z-10 w-20 h-20 rounded-full bg-white/15 hover:bg-red-600 text-white flex items-center justify-center backdrop-blur"
+            className="icon-btn icon-btn--lg icon-btn--glass-lg"
             aria-label="Close question"
           >
             <XIcon size={30} />
           </button>
 
-          <div className="flex-1 flex items-center justify-center p-6 md:p-10 overflow-auto">
-            <div className={`bg-white rounded-3xl shadow-2xl w-full max-w-[85vw] min-h-[85vh] flex flex-col p-6 md:p-10 relative transition-colors duration-1000 ${flashRed ? "bg-[#fecaca]" : "bg-white"}`}>
-              <div className="text-center">
-                <div className="inline-flex items-center gap-4 bg-[#0f1d45] text-white px-8 py-3 rounded-full text-2xl font-black tracking-widest">
+          <div className="prev-clue__center">
+            <div className={`cluecard ${flashRed ? "cluecard--flash" : ""}`}>
+              <div className="cluecard__top">
+                <div className="cluecard__label">
                   {activeClue.boardId === "final"
                     ? "FINAL JEOPARDY"
                     : activeClue.boardId === "double"
@@ -157,38 +142,35 @@ export function PreviewOverlay({
                     ` · ${getClueValue(activeClue.clue, activeClue.rowIdx, activeClue.boardId)}`}
                 </div>
                 {activeClue.clue.isDailyDouble && (
-                  <span className="ml-4 inline-block bg-red-600 text-white px-6 py-2 rounded-full text-2xl font-black">
+                  <span className="badge-dd badge-dd--xl">
                     DAILY DOUBLE
                   </span>
                 )}
-                <p dir="auto" className="text-2xl font-bold tracking-widest text-slate-500 mt-4">
+                <p dir="auto" className="cluecard__cat">
                   {game.boards[activeClue.boardId]?.categories[activeClue.catIdx]?.title}
                 </p>
               </div>
 
-              <div className="flex-1 flex flex-col items-center justify-center py-12">
-                <p dir="auto" className="text-5xl md:text-7xl font-black text-slate-900 text-center leading-tight max-w-[70vw]">
+              <div className="cluecard__body">
+                <p dir="auto" className="cluecard__q">
                   {activeClue.clue.question || "(No question set — edit this clue)"}
                 </p>
 
                 {activeClue.clue.media.length > 0 && (
-                  <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-[70vw]">
+                  <div className="cluecard__media">
                     {activeClue.clue.media.map((m) => (
-                      <div
-                        key={m.id}
-                        className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50"
-                      >
+                      <div key={m.id} className="cluecard__media-item">
                         {m.type === "image" && m.url.trim() && (
-                          <img src={m.url} alt="" className="w-full max-h-[640px] object-contain bg-black" />
+                          <img src={m.url} alt="" className="cluecard__media-frame" />
                         )}
                         {m.type === "video" && m.url.trim() && (
-                          <video src={m.url} controls className="w-full max-h-[640px] bg-black" />
+                          <video src={m.url} controls className="cluecard__media-frame" />
                         )}
                         {m.type === "audio" && m.url.trim() && (
-                          <audio src={m.url} controls className="w-full p-6" />
+                          <audio src={m.url} controls className="cluecard__media-audio" />
                         )}
                         {!m.url.trim() && (
-                          <div className="p-4 text-2xl text-slate-400">Empty {m.type} URL</div>
+                          <div className="cluecard__media-empty">Empty {m.type} URL</div>
                         )}
                       </div>
                     ))}
@@ -196,27 +178,25 @@ export function PreviewOverlay({
                 )}
               </div>
 
-              <div className="pt-8 flex flex-col items-center gap-6">
+              <div className="cluecard__answer-zone">
                 {!showAnswer ? (
-                  <button
-                    onClick={() => setShowAnswer(true)}
-                    className="bg-slate-900 hover:bg-black text-white px-12 py-5 rounded-full font-bold text-3xl"
-                  >
+                  <button onClick={() => setShowAnswer(true)} className="btn-solid-dark">
                     Show Answer
                   </button>
                 ) : (
-                  <div className="bg-[#FFD700]/20 border-2 border-[#FFD700] rounded-2xl px-12 py-8 w-full max-w-[55vw] text-center">
-                    <p className="text-2xl font-black tracking-widest text-slate-600">ANSWER</p>
-                    <p dir="auto" className="text-4xl font-black text-slate-900 mt-2">
+                  <div className="cluecard__answer-box">
+                    <p className="cluecard__answer-label">ANSWER</p>
+                    <p dir="auto" className="cluecard__answer-text">
                       {activeClue.clue.answer || "(No answer set)"}
                     </p>
                   </div>
                 )}
               </div>
 
-              {/* bottom left countdown */}
               {timeLeft != null && activeClue.boardId !== "final" && (
-                <div className={`absolute bottom-4 left-4 z-10 rounded-full px-8 py-4 text-3xl font-black tracking-widest shadow-lg ${timeLeft <= 5 ? "bg-red-600 text-white animate-pulse" : "bg-slate-900 text-white"}`}>
+                <div
+                  className={`countdown-pill ${timeLeft <= 5 ? "countdown-pill--low" : ""}`}
+                >
                   {timeLeft}s
                 </div>
               )}
@@ -238,47 +218,31 @@ function PreviewGrid({
   if (!board) return null;
   const cols = board.categories.length;
   const showCats = board.showCategories;
-  const ROW_LABEL_W = 24;
-  const GAP = 8;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="pvg">
       {showCats && (
-        <div className="flex mb-2 shrink-0" style={{ gap: GAP }}>
-          <div className="shrink-0" style={{ width: ROW_LABEL_W }} />
-          <div
-            className="flex-1 grid"
-            style={{ gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: GAP }}
-          >
+        <div className="pvg-cats">
+          <div className="pvg-spacer" />
+          <div className="pvg-cats-grid" style={{ "--cols": cols } as CSSProperties}>
             {board.categories.map((cat) => (
-              <div
-                key={cat.id}
-                className="bg-[#0f1d45] border-2 border-[#FFD700]/30 rounded-xl p-2 min-h-[40px] flex items-center justify-center text-center"
-              >
-                <span dir="auto" className="text-white font-black text-xs sm:text-sm leading-tight">
-                  {cat.title}
-                </span>
+              <div key={cat.id} className="pvg-cat">
+                <span dir="auto">{cat.title}</span>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      <div className="flex-1 min-h-0 flex flex-col" style={{ gap: GAP }}>
+      <div className="pvg-body">
         {Array.from({ length: board.categories[0]?.clues.length ?? 0 }).map((_, rowIdx) => (
-          <div key={rowIdx} className="flex-1 min-h-0 flex" style={{ gap: GAP }}>
-            <div
-              className="shrink-0 flex items-center justify-center"
-              style={{ width: ROW_LABEL_W }}
-            >
-              <span className="text-white/40 text-[10px] font-bold tracking-wider [writing-mode:vertical-lr] rotate-180 select-none">
+          <div key={rowIdx} className="pvg-row">
+            <div className="pvg-row-label">
+              <span>
                 {board.id === "jeopardy" ? (rowIdx + 1) * 100 : (rowIdx + 1) * 200}
               </span>
             </div>
-            <div
-              className="flex-1 grid min-h-0"
-              style={{ gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: GAP }}
-            >
+            <div className="pvg-cells" style={{ "--cols": cols } as CSSProperties}>
               {board.categories.map((cat, colIdx) => {
                 const clue = cat.clues[rowIdx];
                 const value = getClueValue(clue, rowIdx, board.id);
@@ -286,11 +250,9 @@ function PreviewGrid({
                   <button
                     key={`${cat.id}-${rowIdx}`}
                     onClick={() => onClueClick(colIdx, rowIdx, clue)}
-                    className="rounded-xl border-2 min-h-0 min-w-0 flex items-center justify-center text-center transition border-[#1a2d5c] bg-[#0f1d45] hover:border-[#FFD700] hover:bg-[#1a2d5c] text-[#FFD700] cursor-pointer"
+                    className="pvg-cell"
                   >
-                    <span className="font-black text-lg sm:text-2xl md:text-3xl tracking-tight drop-shadow">
-                      {value}
-                    </span>
+                    <span className="pvg-cell__value">{value}</span>
                   </button>
                 );
               })}
@@ -314,19 +276,14 @@ function FinalPreview({
   if (!clue || !cat) return null;
 
   return (
-    <div className="h-full flex flex-col p-6 max-w-[700px] w-full mx-auto">
+    <div className="pvf-root">
       {board.showCategories && (
-        <div className="shrink-0 bg-[#0f1d45] border-2 border-[#FFD700]/30 rounded-xl px-1.5 py-2 min-h-[44px] flex items-center">
-          <span dir="auto" className="flex-1 min-w-0 text-center font-black text-sm text-white">
-            {cat.title}
-          </span>
+        <div className="pvf-cat">
+          <span dir="auto">{cat.title}</span>
         </div>
       )}
-      <div className="mt-3 flex-1 min-h-0 rounded-xl border-2 border-[#1a2d5c] bg-[#0f1d45] hover:border-[#FFD700] hover:bg-[#1a2d5c] transition flex items-center justify-center text-center cursor-pointer">
-        <button
-          onClick={() => onClueClick(clue)}
-          className="w-full h-full flex items-center justify-center text-[#FFD700] font-black text-2xl md:text-4xl tracking-tight drop-shadow"
-        >
+      <div className="pvf-clue-box">
+        <button onClick={() => onClueClick(clue)} className="pvf-clue-btn">
           FINAL JEOPARDY
         </button>
       </div>

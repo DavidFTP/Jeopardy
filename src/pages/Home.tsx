@@ -1,3 +1,4 @@
+import "./Home.css";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { HomeTopBar } from "../components/TopBar";
@@ -45,32 +46,27 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f1d45]">
+    <div className="home-page">
       <HomeTopBar onCreate={handleCreate} />
 
-      <main className="max-w-[1400px] mx-auto px-6 py-8">
-        <div className="flex items-baseline gap-3 mb-6">
-          <h2 className="text-white font-black text-2xl">Games</h2>
-          <span className="text-white/60 text-sm">
+      <main className="home-main">
+        <div className="home-heading">
+          <h2>Games</h2>
+          <span>
             {games.length} {games.length === 1 ? "game" : "games"}
           </span>
         </div>
 
         {games.length === 0 ? (
-          <div className="bg-white rounded-2xl p-10 text-center shadow">
-            <p className="text-slate-700 font-semibold text-lg">No games yet</p>
-            <p className="text-slate-500 text-sm mt-1">
-              Create your first Jeopardy game to get started.
-            </p>
-            <button
-              onClick={handleCreate}
-              className="mt-6 bg-[#0f1d45] hover:bg-[#1a2d5c] text-white font-bold px-8 py-3 rounded-full shadow transition"
-            >
+          <div className="home-empty">
+            <p>No games yet</p>
+            <p>Create your first Jeopardy game to get started.</p>
+            <button onClick={handleCreate} className="btn btn-navy btn-gold--noshadow home-empty__create">
               + Create game
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="home-grid">
             {games.map((g, i) => {
               void force;
               const playing = hasActiveSession(g.id);
