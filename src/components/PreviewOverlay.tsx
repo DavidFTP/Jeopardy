@@ -56,6 +56,19 @@ export function PreviewOverlay({
     return () => clearTimeout(t);
   }, [timeLeft]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!activeClue || timeLeft == null) return;
+      if (e.key === "+") {
+        setTimeLeft((s) => (s == null ? null : s + 5));
+      } else if (e.key === "-") {
+        setTimeLeft((s) => (s == null ? null : Math.max(0, s - 5)));
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeClue, timeLeft]);
+
   return (
     <div className="prev-root" style={{ background: "#0f1d45" }}>
       <div className="prev-top-left">
@@ -134,9 +147,11 @@ export function PreviewOverlay({
                     DAILY DOUBLE
                   </span>
                 )}
-                <p dir="auto" className="cluecard__cat">
-                  {game.boards[activeClue.boardId]?.categories[activeClue.catIdx]?.title}
-                </p>
+                {game.boards[activeClue.boardId]?.showCategories && (
+                  <p dir="auto" className="cluecard__cat">
+                    {game.boards[activeClue.boardId]?.categories[activeClue.catIdx]?.title}
+                  </p>
+                )}
               </div>
 
               <div className="cluecard__body">

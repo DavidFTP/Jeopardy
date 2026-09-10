@@ -628,6 +628,11 @@
   min-width: 280px;
   justify-content: space-between;
 }
+.answer-frame--current {
+  background: var(--navy-700);
+  border-color: var(--navy-700);
+  color: var(--gold);
+}
 .answer-frame__name {
   font-weight: 700;
   font-size: 30px;

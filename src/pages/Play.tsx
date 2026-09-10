@@ -142,6 +142,19 @@ export default function Play() {
     return () => clearTimeout(t);
   }, [timeLeft]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!activeClue || timeLeft == null) return;
+      if (e.key === "+") {
+        setTimeLeft((s) => (s == null ? null : s + 5));
+      } else if (e.key === "-") {
+        setTimeLeft((s) => (s == null ? null : Math.max(0, s - 5)));
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeClue, timeLeft]);
+
   const persistSession = (
     nextPlayers: Player[],
     nextAnswered: Set<string>,
@@ -1104,19 +1117,16 @@ export default function Play() {
                         DAILY DOUBLE
                       </span>
                     )}
-                    {activeClue.boardId === "double" ||
-                    activeClue.boardId === "jeopardy" ? (
-                      <p dir="auto" className="cluecard__cat">
-                        {
-                          game.boards[activeClue.boardId].categories[
-                            activeClue.catIdx
-                          ]?.title
-                        }
-                      </p>
-                    ) : (
-                      <p dir="auto" className="cluecard__cat">
-                        {game.boards.final.categories[0]?.title}
-                      </p>
+                    {game.boards[activeClue.boardId]?.showCategories && (
+                      activeClue.boardId === "final" ? (
+                        <p dir="auto" className="cluecard__cat">
+                          {game.boards.final.categories[0]?.title}
+                        </p>
+                      ) : (
+                        <p dir="auto" className="cluecard__cat">
+                          {game.boards[activeClue.boardId].categories[activeClue.catIdx]?.title}
+                        </p>
+                      )
                     )}
                   </div>
 
@@ -1207,7 +1217,7 @@ export default function Play() {
                     ).map((p) => {
                       if (removedFromClue.has(p.id)) return null;
                       return (
-                        <div key={p.id} className="answer-frame">
+                        <div key={p.id} className={`answer-frame${players[currentTurnIndex]?.id === p.id ? " answer-frame--current" : ""}`}>
                           <span className="answer-frame__name">{p.name}</span>
                           <div className="answer-frame__actions">
                             <div className="answer-frame__hov">
