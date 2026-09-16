@@ -170,7 +170,7 @@ export default function Edit() {
         onTitleChange={(v) => setGame({ ...game, title: v })}
         onBack={handleBack}
         onPlay={handlePlay}
-        onPreview={() => setPreviewOpen(true)}
+        onPreview={() => setPreviewOpen((prev) => !prev)}
         placeholder={placeholder}
       />
 

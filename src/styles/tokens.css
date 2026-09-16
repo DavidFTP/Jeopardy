@@ -47,9 +47,48 @@
   --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 
   --t-fast: 0.15s ease;
+  --t-spring: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --t-slide: 0.25s ease-out;
 
-  /* board editor layout */
-  --editor-gap: 12px;
-  --board-gap: 8px;
-  --row-label-w: 24px;
+  /* fluid type scale (clamp: min, preferred, max) */
+  --text-2xs: clamp(0.625rem, 0.58rem + 0.22vw, 0.75rem);
+  --text-xs: clamp(0.75rem, 0.68rem + 0.35vw, 0.875rem);
+  --text-sm: clamp(0.875rem, 0.82rem + 0.27vw, 1rem);
+  --text-base: clamp(1rem, 0.92rem + 0.4vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 1.02rem + 0.52vw, 1.25rem);
+  --text-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+  --text-2xl: clamp(1.5rem, 1.28rem + 1.1vw, 2rem);
+  --text-3xl: clamp(1.875rem, 1.5rem + 1.87vw, 2.5rem);
+  --text-4xl: clamp(2.25rem, 1.7rem + 2.75vw, 3.5rem);
+  --text-5xl: clamp(3rem, 2.1rem + 4.5vw, 5rem);
+
+  /* fluid spacing scale */
+  --space-1: clamp(0.25rem, 0.2rem + 0.25vw, 0.375rem);
+  --space-2: clamp(0.5rem, 0.42rem + 0.4vw, 0.75rem);
+  --space-3: clamp(0.75rem, 0.62rem + 0.65vw, 1rem);
+  --space-4: clamp(1rem, 0.82rem + 0.9vw, 1.5rem);
+  --space-5: clamp(1.25rem, 1rem + 1.25vw, 2rem);
+  --space-6: clamp(1.5rem, 1.2rem + 1.5vw, 2.5rem);
+  --space-8: clamp(2rem, 1.5rem + 2.5vw, 3.5rem);
+  --space-10: clamp(2.5rem, 1.8rem + 3.5vw, 4.5rem);
+  --space-12: clamp(3rem, 2rem + 5vw, 6rem);
+
+  /* board editor layout (fluid) */
+  --editor-gap: var(--space-3);
+  --board-gap: var(--space-2);
+  --row-label-w: clamp(2rem, 3vw, 2.5rem);
+
+  /* layout */
+  --header-h: clamp(56px, 8vh, 72px);
+  --sidebar-w: clamp(10rem, 15vw, 12rem);
+  --bottom-sheet-h: 70dvh;
+  --bottom-sheet-h-lg: 60dvh;
+
+  /* z-index scale */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal-backdrop: 300;
+  --z-modal: 310;
+  --z-toast: 400;
+  --z-tooltip: 500;
 }

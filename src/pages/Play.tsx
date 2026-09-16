@@ -62,6 +62,8 @@ export default function Play() {
     danger?: boolean;
     onConfirm: () => void;
   } | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [useSpringAnimation, setUseSpringAnimation] = useState(false);
 
   useEffect(() => {
     load();
@@ -647,13 +649,19 @@ export default function Play() {
         <Link to="/" className="btn-glass btn-xs">
           ← Home
         </Link>
-        <button onClick={() => setSetupOpen(true)} className="btn-glass btn-xs">
+        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="btn-glass btn-xs">
           Players
         </button>
         <button onClick={requestRestart} className="btn-danger btn-xs">
           Restart
         </button>
       </div>
+
+      <div
+        className={`play-sidebar-backdrop ${sidebarOpen ? "play-sidebar-backdrop--visible" : ""}`}
+        onClick={() => setSidebarOpen(false)}
+        aria-hidden="true"
+      />
 
       <header className="play-header">
         <div className="play-header__title">{EVENT_NAME}</div>
@@ -833,7 +841,10 @@ export default function Play() {
           </main>
         </div>
 
-        <div className="play-sidebar">
+        <aside
+          className={`play-sidebar ${sidebarOpen ? "play-sidebar--open" : ""} ${useSpringAnimation ? "play-sidebar--spring" : ""}`}
+        >
+          <div className="play-sidebar__handle" onClick={() => setUseSpringAnimation(!useSpringAnimation)} title="Toggle spring animation" />
           {players.length === 0 ? (
             <p className="play-sidebar__none">No players yet</p>
           ) : (
@@ -843,6 +854,7 @@ export default function Play() {
                 onClick={() => {
                   setEditingPlayer(p);
                   setEditScore(String(p.score));
+                  setSidebarOpen(false);
                 }}
                 className={`play-sidebar__row ${idx === currentTurnIndex ? "play-sidebar__row--active" : "play-sidebar__row--idle"}`}
               >
@@ -858,7 +870,7 @@ export default function Play() {
               </button>
             ))
           )}
-        </div>
+        </aside>
       </div>
 
       {setupOpen && (

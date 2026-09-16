@@ -1,7 +1,7 @@
 .home-bar {
   position: sticky;
   top: 0;
-  z-index: 20;
+  z-index: var(--z-sticky);
   background: var(--navy-800);
   border-bottom: 1px solid rgb(255 255 255 / 0.1);
   box-shadow: var(--shadow-md);
@@ -10,21 +10,23 @@
 .home-bar__inner {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 14px 24px;
+  padding: var(--space-3) var(--space-4);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
 }
 
 .home-bar__title {
   color: var(--white);
   font-weight: 900;
   letter-spacing: -0.025em;
-  font-size: 20px;
+  font-size: var(--text-lg);
 }
 @media (min-width: 768px) {
   .home-bar__title {
-    font-size: 24px;
+    font-size: var(--text-xl);
   }
 }
 
@@ -32,8 +34,8 @@
   background: var(--gold);
   color: var(--navy-900);
   font-weight: 800;
-  font-size: 14px;
-  padding: 8px 24px;
+  font-size: var(--text-sm);
+  padding: var(--space-2) var(--space-5);
   border-radius: var(--r-pill);
   box-shadow: var(--shadow-md);
   transition: background-color var(--t-fast);
@@ -44,14 +46,14 @@
 }
 @media (min-width: 768px) {
   .home-bar__create {
-    font-size: 16px;
+    font-size: var(--text-base);
   }
 }
 
 .edit-bar {
   position: sticky;
   top: 0;
-  z-index: 20;
+  z-index: var(--z-sticky);
   background: var(--white);
   border-bottom: 1px solid var(--slate-200);
   box-shadow: var(--shadow-sm);
@@ -60,17 +62,18 @@
 .edit-bar__inner {
   max-width: 1800px;
   margin: 0 auto;
-  padding: 0 24px;
-  height: 64px;
+  padding: 0 var(--space-4);
+  height: var(--header-h);
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: var(--space-4);
+  flex-wrap: wrap;
 }
 
 .edit-bar__back {
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: var(--slate-100);
   color: var(--slate-500);
@@ -85,13 +88,13 @@
 }
 
 .edit-bar__title {
-  width: 288px;
+  width: clamp(200px, 30vw, 288px);
   background: transparent;
   color: var(--slate-900);
   border: 1px solid var(--slate-300);
   border-radius: var(--r-md);
-  padding: 8px 16px;
-  font-size: 14px;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
   font-weight: 600;
   outline: none;
   transition: border-color var(--t-fast), box-shadow var(--t-fast);
@@ -111,14 +114,14 @@
 .edit-bar__actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-3);
   flex-shrink: 0;
 }
 
 .edit-bar__preview {
   display: none;
   color: var(--slate-500);
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 600;
   transition: color var(--t-fast);
   cursor: pointer;
@@ -135,9 +138,9 @@
 .edit-bar__play {
   background: var(--slate-100);
   color: var(--slate-500);
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 600;
-  padding: 8px 20px;
+  padding: var(--space-2) var(--space-4);
   border-radius: var(--r-md);
   transition: background-color var(--t-fast), color var(--t-fast);
 }

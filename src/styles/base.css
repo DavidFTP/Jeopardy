@@ -11,7 +11,7 @@ body {
 }
 
 body {
-  min-height: 100vh;
+  min-height: 100dvh;
   background: #0a0e2e;
   color: var(--slate-200);
   font-family:
@@ -20,12 +20,21 @@ body {
     "Segoe UI",
     Roboto,
     sans-serif;
+  font-size: var(--text-base);
 }
 
 #root {
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
+}
+
+/* container query roots */
+.play-main__inner,
+.bge-root,
+.edit-content,
+.bpg {
+  container-type: inline-size;
 }
 
 button,
@@ -77,4 +86,96 @@ textarea {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #475569;
+}
+
+/* touch targets */
+@media (pointer: coarse) {
+  button,
+  [role="button"],
+  a,
+  input[type="checkbox"],
+  input[type="radio"],
+  select,
+  .icon-btn,
+  .bpg-cell,
+  .bge-cell,
+  .answer-frame__btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .btn {
+    padding: 14px 28px;
+  }
+  
+  .btn-gold {
+    padding: 14px 32px;
+  }
+  
+  .btn-gold--big {
+    padding: 16px 40px;
+  }
+  
+  .pill-tab {
+    padding: 14px 12px;
+  }
+  
+  .pill-tab--active {
+    padding: 14px 40px;
+  }
+  
+  .pill-tab--idle {
+    padding: 14px 30px;
+  }
+  
+  .text-input {
+    padding: 14px 16px;
+    font-size: max(16px, var(--text-base));
+  }
+  
+  .text-input--lg {
+    padding: 16px 20px;
+  }
+  
+  .input-ghost {
+    min-height: 44px;
+    font-size: max(16px, var(--text-base));
+  }
+  
+  .toggle-track {
+    width: 52px;
+    height: 28px;
+  }
+  
+  .toggle-track::after {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .toggle input:checked + .toggle-track::after {
+    transform: translateX(24px);
+  }
+  
+  .icon-btn--sm {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .icon-btn--md {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .icon-btn--lg {
+    width: 56px;
+    height: 56px;
+  }
+  
+  .bpg-row-label {
+    min-width: 44px;
+  }
+  
+  .bge-row-label {
+    min-width: 44px;
+  }
 }

@@ -72,7 +72,7 @@ export function PreviewOverlay({
   return (
     <div className="prev-root" style={{ background: "#0f1d45" }}>
       <div className="prev-top-left">
-        <button onClick={onClose} className="btn-glass">
+        <button onClick={onClose} className="btn-glass btn-xs">
           ← Back to Edit
         </button>
       </div>
